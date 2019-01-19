@@ -7,7 +7,7 @@ urlcolor: blue
 ---
 
 ```{R setup, include = FALSE}
-knitr::opts_chunk$set(comment = NA, prompt = TRUE)
+knitr::opts_chunk$set(comment = NA, prompt = TRUE, collapse = TRUE)
 ```
 
 This document gives a brief introduction to one of `R`'s most useful standard packages -- the `parallel` package.
@@ -24,7 +24,7 @@ A sensible approach would consists of the following steps:
   3. The total number of primes between 2 and 5,000,000 is the number of primes detected in step \#2. 
   
 Here is a function that can be used to check if a given integer is a prime:
-```{R, collapse = TRUE}
+```{R}
 is.prime <- function(n) ifelse(n == 2 || sum(!(n %% 1:ceiling(sqrt(n)))) == 1, TRUE, FALSE)
 is.prime(2) ## 2 is a prime
 is.prime(197) ## 197 is a prime
@@ -32,7 +32,7 @@ is.prime(19791) ## 19791 is not a prime
 ```
 
 The following code gives the number of prime numbers between 2 and 5,000,000 while avoiding the use of `for` loops.
-```{R, collapse = TRUE}
+```{R}
 system.time(print(sum(sapply(2:5e6, is.prime))))
 ```
 
