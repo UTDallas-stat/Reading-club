@@ -82,7 +82,7 @@ The `parallel` also offers functions like `parLapply` and `parApply` to replace 
 Note that the computing time with `parSapply` in this example is not
 proportional to the computing time without.
 The lost in computing time is due to the communication between processes.
-A more efficient way for our example is to submit a batch of jobs to each cluster.
+A (possibly) more efficient way for our example is to submit a batch of jobs to each cluster.
 For example:
 ```{R}
 cl <- makePSOCKcluster(detectCores())
