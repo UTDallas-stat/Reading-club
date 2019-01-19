@@ -1,6 +1,7 @@
 ---
 title: "Parallel package"
 output: pdf_document
+author: Steven Chiou
 geometry: left = .5in, right = .5in, top = 1in, bottom = .6in
 urlcolor: blue
 ---
