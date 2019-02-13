@@ -1,0 +1,204 @@
+---
+title: "BookClub"
+author: "Norah Alyabs"
+date: "February 12, 2019"
+output: ioslides_presentation
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Hands-On Programming with R
+
+**WRITE YOUR OWN FUNCTIONS AND SIMULATIONS**
+
+*By:*
+
+*Garrett Grolemund*
+
+
+## Using the functions in R is like riding a bus. Writing programs in R is like driving a car.
+
+
+Using this analogy, programs like SPSS are busses, easy to use for the standard things,
+but very frustrating if you want to do something that is not already preprogrammed.
+R is a 4-wheel drive SUV (though environmentally friendly) with a bike on the back, a
+kayak on top, good walking and running shoes in the passenger seat, and mountain
+climbing and spelunking gear in the back.
+
+R can take you anywhere you want to go if you take time to learn how to use the equipment,
+but that is going to take longer than learning where the bus stops are in SPSS.
+
+*Greg Snow*
+
+## Projects
+
+- Project 1: Weighted Dice
+- Project 2: Playing Cards
+- Project 3: Slot Machine
+
+
+## Project 1: Weighted Dice
+
+```{r, echo=TRUE}
+roll <- function() {
+ die <- 1:6
+ dice <- sample(die, size = 2, replace = TRUE)
+ sum(dice)}
+roll()
+```
+
+```{r, echo=TRUE}
+roll2 <- function() {
+ die <- 1:6
+ dice <- sample(die, size = 2, replace = TRUE,
+ prob = c(1/8, 1/8, 1/8, 1/8, 1/8, 3/8))
+ sum(dice)}
+roll2()
+```
+
+## Project 2: Playing Cards:
+
+- R Objects:
+
+ Design and build a virtual deck of playing cards
+
+- R Notation
+
+Write functions that deal and shuffle
+
+- Modifying Values
+
+ Change the point system to suit your game
+ 
+ - Environments
+
+ Manage the state of the deck
+
+## R codes:
+
+```{r, echo=TRUE}
+deck <- read.csv("~/deck.csv")
+shuffle <- function(cards) { random <- sample(1:52, size = 52)
+ cards[random, ]}
+deal <- function(cards) { cards[1, ]}
+deck2 <- shuffle(deck)
+deal(deck2)
+facecard <- deck$face %in% c("king", "queen", "jack")
+deck[facecard, ]
+```
+## Project 3: Slot Machine:
+
+- Programs
+- S3
+- Loops
+- Speed
+
+## R codes
+
+```{r cars, echo = TRUE}
+get_symbols <- function() {
+ wheel <- c("DD", "7", "BBB", "BB", "B", "C", "0")
+ sample(wheel, size = 3, replace = TRUE,
+ prob = c(0.03, 0.03, 0.06, 0.1, 0.25, 0.01, 0.52))
+}
+get_symbols()
+```
+
+## Strategy:
+
+1. Break complex tasks into simple sub-tasks.
+2. Use concrete examples.
+3. Describe your solutions in English, then convert them to R.
+
+## score function:
+
+```{r , echo = TRUE}
+score <- function (symbols) {
+ # identify case
+ same <- symbols[1] == symbols[2] && symbols[2] == symbols[3]
+ bars <- symbols %in% c("B", "BB", "BBB")
+# get prize
+ if (same) {
+ payouts <- c("DD" = 100, "7" = 80, "BBB" = 40, "BB" = 25,
+ "B" = 10, "C" = 10, "0" = 0)
+ prize <- unname(payouts[symbols[1]])
+ } else if (all(bars)) {
+ prize <- 5
+ } else {
+ cherries <- sum(symbols == "C")
+ prize <- c(0, 2, 5)[cherries + 1]
+ }
+# adjust for diamonds
+ diamonds <- sum(symbols == "DD")
+ prize * 2 ^ diamonds
+}
+ 
+ ```
+ 
+  -----------------
+```{r , echo = TRUE}
+play <- function() {
+ symbols <- get_symbols()
+ print(symbols)
+ score(symbols)
+}
+
+play()
+
+```
+
+##The S3 System:
+
+S3 refers to a class system built into R. The system governs how R handles objects of
+different classes. Certain R functions will look up an object’s S3 class, and then behave
+differently in response.
+
+## Loop:
+Used to simulate slot machine plays by replication and calculate their payout.
+
+rolls <- expand.grid(die, die)
+
+- for (value in that) {
+ this}
+
+-while (condition) {
+ code}
+
+-repeat Loops
+
+
+## Speed (using Vectorized Code):
+
+Simulate 10 million plays of the slot machine!!
+
+**How to increase the speed of your *for* loops:**
+
+1-  If a line of code only needs to be run once, place it outside of the loop to avoid repetition
+
+2-  make sure that any storage objects that you use with the loop are large enough to contain all of the results of the loop
+
+## Pros & Cons:
+
+Pros:
+
+1- Easy language.
+
+2- Illustrate basics.
+
+3- Clear examples and examine the reader.
+
+4- Used chart to explain steps.
+
+5- Explained the fundamental of simulation and how to make it faster
+
+Cons:
+
+1- Few statistical graphs
+
+2- Environment is not much useful
+
+
+##Thank you
