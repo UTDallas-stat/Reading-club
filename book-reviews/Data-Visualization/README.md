@@ -1,0 +1,1 @@
+Reading notes for "Fundamentals of Data Visualization" by Claus O. Wilke

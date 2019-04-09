@@ -1,0 +1,45 @@
+---
+title: "R For Data Science" 
+output: 
+  rmarkdown::html_document:
+    toc: true
+    toc_depth: 2
+    toc_float: true
+date: "`r Sys.Date()`"
+geometry: left = .5in, right = .5in, top = 1in, bottom = .6in
+urlcolor: blue
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(prompt = TRUE, comment = "", collapse = TRUE) 
+options(width = 100)
+```
+
+Load `tidyverse` with
+```{r, message = FALSE}
+library(tidyverse)
+```
+## `arrange` 
+The `arrange` function offers a convenient way to order a data frame by columns.
+Here is a book example: 
+```{r}
+df <- tibble(x = c(5, 2, NA), y = runif(3))
+arrange(df, x)
+arrange(df, desc(x))
+```
+The data (`df`) was arranged by the column `x` in either a descending order or ascending order.
+A similar but standard function is to use the `order` function. For example,
+```{r}
+df[order(df$x),]
+df[order(df$x, decreasing = TRUE),]
+```
+The `arrange` approach is more intuitive but the `order` approach is slighly faster.
+```{r}
+library(microbenchmark)
+microbenchmark(arrange(df, x), df[order(df$x),])
+```
+Sorting with `is.na()` will be based on 0's and 1's (`FALSE` has a value of 0 and `TRUE` has a value of .).
+```{r}
+arrange(df, desc(is.na(x)))
+order(is.na(df$x), decreasing = TRUE)
+```

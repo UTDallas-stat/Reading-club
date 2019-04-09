@@ -1,0 +1,66 @@
+---
+title: "`ggplot2` package -- `qplot`"
+output: pdf_document
+author: Steven Chiou
+geometry: left = .5in, right = .5in, top = 1in, bottom = .6in
+urlcolor: blue
+---
+
+```{R setup, include = FALSE}
+knitr::opts_chunk$set(comment = NA, prompt = TRUE, collapse = TRUE)
+```
+
+This document gives a brief introduction to one of `R`'s most powerful package for visualization
+      -- the `ggplot2` package with an emphaze in the `qplot` function.
+
+The two main functions in `ggplot2` are `ggplot` and `qplot`. 
+Of those, `qplot` is made to mimic the format of `plot` from the base `R`, requires less syntax for many common tasks, and is more beginner-friendly.
+
+**Motivating example
+We will use the `mpg` dataset to demanstrate some key features of `qplot.
+```{R, load}
+library(ggplot2)
+mpg
+```
+As with `plot`, the first two arguments in `qplot` are the "`x`"" and "`y`".
+On the other hand, `ggplot` relies on aesthetic mapping.
+```{R}
+args(qplot)
+args(ggplot)
+```
+Here is a simple histogram comparison:
+```{R, fig.width = 4, fig.height = 4, fig.show = 'hold'}
+plot(mpg$cty, mpg$hwy)
+qplot(cty, hwy, data = mpg)
+```
+You can add a color layer based on information about `cyl`.
+```{R, fig.width = 4, fig.height = 4, fig.show = 'hold'}
+qplot(cty, hwy, data = mpg, color = cyl)
+qplot(cty, hwy, data = mpg, color = factor(cyl))
+```
+Or a size layer.
+```{R, fig.width = 4, fig.height = 4, fig.show = 'hold'}
+qplot(cty, hwy, data = mpg, size = cyl)
+qplot(cty, hwy, data = mpg, size = displ)
+```
+Even shapes.
+```{R, fig.width = 4, fig.height = 4, fig.show = 'hold'}
+qplot(cty, hwy, data = mpg, shape = drv)
+qplot(cty, hwy, data = mpg, shape = factor(cyl))
+```
+With combine mapping.
+```{R, fig.width = 4, fig.height = 4, fig.show = 'hold'}
+qplot(cty, hwy, data = mpg, shape = drv, color = drv)
+qplot(cty, hwy, data = mpg, shape = drv, size = displ)
+```
+Different types of aesthetic attributes work better with different types of variables.
+An alternative is to use "faceting", a mechanism for automatically laying out multiple plots on a page.
+```{R, fig.width = 4, fig.height = 4, fig.show = 'hold'}
+qplot(cty, hwy, data = mpg, facets = drv ~ .)
+qplot(cty, hwy, data = mpg, facets = . ~ drv)
+```
+More examples
+```{R, fig.width = 4, fig.height = 4, fig.show = 'hold'}
+qplot(cty, hwy, data = mpg, facets = drv ~ year)
+qplot(cty, hwy, data = mpg, facets =  ~ year + drv)
+```
