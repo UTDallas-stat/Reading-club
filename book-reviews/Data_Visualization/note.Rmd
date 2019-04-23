@@ -112,3 +112,43 @@ grid.arrange(g1, g2, ncol = 2)
 * Whenever possible, design your figures so they don’t need a legend.
 
 ## Multi-panel figures
+
+Small multiples 
+
+* Always arrange the panels in a small multiples plot in a meaningful and logical order.
+* Use the same scale (`x` axis and `y` axis) throughout the small multiples 
+
+Compound figures
+
+* Refer to with Fig xx.xx rather than top/left/bottom/right panel.
+* lower case letters inside the figures
+* Align figures
+* Be coherent on content and colors
+
+## Commonly used image file formats
+
+Bitmap and vector graphics
+
+* `pdf` (vector) is good for general purpose
+* `png` (bitmap) is optimized for line drawings
+* `jpeg` (bitmap) is optimized for photographic images
+
+## Commonly used image file formats
+
+* Vector graphics are "resolution-independent" 
+
+    * They can be magnified to arbitrary size without losing detail or sharpness.
+
+* Vector graphics have downsides
+
+    * Vector graphics are redrawn on the fly by the graphics program with which they are displayed
+    * Can show differences in how the same graphic looks in two different programs, or on two different computers. 
+    * Large file sizes/slow to render for large/complex figures.
+    
+## Commonly used image file formats
+    
+* Most bitmap file formats employ some form of data compression to keep file sizes manageable.
+* Could have side effects like blurry details.
+*  Converting between image formats -- don't...
+
+
