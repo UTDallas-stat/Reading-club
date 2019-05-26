@@ -1,0 +1,35 @@
+---
+title: "Self study note"
+output: pdf_document
+author: Steven Chiou
+geometry: left = .5in, right = .5in, top = 1in, bottom = .6in
+urlcolor: blue
+---
+
+```{R setup, include = FALSE}
+knitr::opts_chunk$set(comment = NA, prompt = TRUE, collapse = TRUE)
+```
+
+## Chapter 1
+  - `.Call()` 
+  - `SEXP` pointer to S expression type
+  - `Rcpp::as<int>` converts the incoming argument from `SEXP` to integer.
+  - `Rcpp::wrap()` converts the result to `SEXP` type returned by a function used with `.Call()`.
+  - `inline` package provies complete wrappers for *compilation*, *linking*, and *loading* steps. 
+    - `cxxfunction()` 
+      - `sig` signature (input variables) of the function
+      - `body` C++ codes to include/compiled; wrap with "`...`"
+      - `plugin` Rcpp or others
+      - `include` pure C++ function to pass through
+  - `compiler` package compile regular `R` codes with `cmpfun` function.
+      
+## Chapter 2
+  - To compile, link, and load:
+    - `R CMD SHLIB` triggers `g++`
+    - `dyn.load` to load the generated `.so` file
+    - `.Call()` to call the `C/C++` file that's made available
+  - `cxxfunction` with `rcpp` plugin reduce to `rcpp` function
+  - Add `LinkingTo: Rcpp` in `DESCRIPTION` when including it in a package. 
+  - Usage of `Rcpp` via `inline` is portable as `R` itself.
+  - Adding `verbose=TRUE` in `cxxfunction` or `rcpp` shows both the temporary file created by `cxxfunction()` and the invocations by `R CMD SHLIB`. 
+  - Use `include=` in `cxxfunction` to reduce the number of operator needed.
