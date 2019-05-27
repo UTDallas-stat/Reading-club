@@ -15,7 +15,7 @@ knitr::opts_chunk$set(comment = NA, prompt = TRUE, collapse = TRUE)
   - `SEXP` pointer to S expression type
   - `Rcpp::as<int>` converts the incoming argument from `SEXP` to integer.
   - `Rcpp::wrap()` converts the result to `SEXP` type returned by a function used with `.Call()`.
-  - `inline` package provies complete wrappers for *compilation*, *linking*, and *loading* steps. 
+  - `inline` package provides complete wrappers for *compilation*, *linking*, and *loading* steps. 
     - `cxxfunction()` 
       - `sig` signature (input variables) of the function
       - `body` C++ codes to include/compiled; wrap with "`...`"
@@ -33,3 +33,39 @@ knitr::opts_chunk$set(comment = NA, prompt = TRUE, collapse = TRUE)
   - Usage of `Rcpp` via `inline` is portable as `R` itself.
   - Adding `verbose=TRUE` in `cxxfunction` or `rcpp` shows both the temporary file created by `cxxfunction()` and the invocations by `R CMD SHLIB`. 
   - Use `include=` in `cxxfunction` to reduce the number of operator needed.
+  - Plugins provide a general mechanism to supply additional information which may be needed to compile and link the particular package.
+  - `try` `throw` from `std::exception` work similar to the `tryCatch` function in `R`; what happen after the `throw` is that a suitable `catch()` segment is identified.
+  - `Rcpp::cppFunction` vs  `inline::cxxFunction`
+
+## Chapter 3
+  - R object itself is internally represented by a `SEXP`, a pointer to a *S expression object*
+  - Users of **Rcpp** API never need to manually allocate memory, or free it after use. 
+  - User visible classes derive from the `RObject` class: 
+    - `IntegerVector`/`IntegerMatrix` for vectors/matrices of type `integer`.
+    - `NumericVector`/`NumericMatrix` for vectors/matrices of type `numeric`.
+    - `LogicalVector`/`LogicalMatrix` for vectors/matrices of type `logical`.
+    - `CharacterVector` for vectors of type `character`.
+    - `GenericVector` for generic vectors which implement `List` types (equivalent to `List`).
+    - `ExpressionVector` for vectors of `expression` types.
+    - `RawVector` for vectors of type `raw`.
+  - `as<>()` function for converting from R to C++ and the `wrap()` function for the inverse direction. 
+  - R integer vectors can be converted into `std::vector<int>`
+  - Reading a vector: `Rcpp::NumericVector a(b);`, where `a` is the name used in the chunk and `b` is the input specified by the signature in `cxxfunction`.
+  - Reading a scalar and store it under a name: `double a = Rcpp::as<double>(b)`.
+  - If more than one vectors are constructed from the input, the code will try to modify copy along with the original vector; need a separate name.
+  - `clone` is a generic feature of vectors derived from `RObject` object; `a = Rcpp::clone(b)`.
+  - When calling from the same algorithm, e.g., STL algorithm, `std::` only need to be specified in the first appearance, and `::` afterward.
+  - `return Rcpp::wrap(xxx);` can be replaced with `return xxx;` when `xxx` is declared through `Rcpp::`.
+  - Why `clone` in example 3.3.3?
+  
+## Chapter 4
+  - The `Named` class promits the usage of named vector.
+  - `Rcpp::NumericVector::create(` or `NumericVector::create(` to create a named numerical vector.
+  - `Rcpp::Named("key")` can be replaced with `_["key"]`.
+  - `Rcpp::List` to create a list. 
+  - `Rcpp::as<double>(list["key"])` to extract components from list `key`.
+  - `return Rcpp:List::create(Rcpp::Named("key") = xxx, ...` to return a created list.
+  - An alternative way to create a list is to use `Rcpp::List ll(4)` up front. This requires prior knowledge of the list length. When running out, one can use `push_back()` or `push_front()` for insertion. 
+  - Data frame can be seen as a specialization of a list, with the added restrictions of excluding nesting types and of imposing common length. 
+  - Creating a data frame is similar to creating a list with `Rcpp::DataFrame::create(` and `Rcpp::Named("key") = x` to name. 
+  -
