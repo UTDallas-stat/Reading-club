@@ -1,0 +1,37 @@
+---
+title: "Self study note for A User's Guide to Network Analysis in R"
+output: pdf_document
+author: Steven Chiou
+geometry: left = .5in, right = .5in, top = 1in, bottom = .6in
+urlcolor: blue
+---
+
+```{R setup, include = FALSE}
+knitr::opts_chunk$set(comment = NA, prompt = TRUE, collapse = TRUE)
+```
+
+## Chapter 2
+    - Size: Number of nodes (vertices or actors). 
+    - Ties: edges or relations connecting nodes
+    - Density: Proportion of observed ties in a network to the maximum number of possible ties.
+    - Directed network has directions; A to B is different than B to A
+    - Directed network does not have directions; A to B is the same as B to A.
+    - Components: subgroup in which all nodes are connected. 
+    - Path: series of steps required to go from A to B in a network. 
+    - Diameter: longest of the shortest paths (geodesics) across all pairs of nodes.
+    - Measures the compactness or network efficiency. 
+    - `sna::component.largest()`: 
+      - `result = "membership"`: returns the logical vector indicating membership in a maximum component 
+      - `result = "graph"`: returns the adjacency matrix (sociomatrix) of the subgraph induced 
+      by the maximum component.
+    - `sna::geodist()` calculates the shortest paths given adjacency matrix.
+    -Transitivity: The proportion of closed triangles (triads where all three ties are observed) to 
+    the total number of open and closed triangles (triads where two or three ties are observed).
+
+## Chapter 3
+  - Direct tie: arc
+  - Nondirect tie: edge
+  - Define a network object in `R` with an adjacency matrix or edge list with `network::network()`.
+  - `network` class is compatible with `ggplot2`
+  - `as.matrix` a `network` object after loading `statnet` gives the adjacency matrix.
+  - 

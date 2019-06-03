@@ -82,11 +82,8 @@ return x * 2;
 }')
 timesTwo(120)
 
-sourceCpp(code = '
-#include <Rcpp.h>
-using namespace Rcpp;
-// [[Rcpp::export]]
-return wrap(seq_len(10));
+evalCpp(code = '
+seq_len(10);
 ')
 
 sourceCpp(code = '
