@@ -34,4 +34,10 @@ knitr::opts_chunk$set(comment = NA, prompt = TRUE, collapse = TRUE)
   - Define a network object in `R` with an adjacency matrix or edge list with `network::network()`.
   - `network` class is compatible with `ggplot2`
   - `as.matrix` a `network` object after loading `statnet` gives the adjacency matrix.
-  - 
+  - `%v%` calls a vertice from a network
+  - `%e%` calls an edge from a network
+  - Network object can be created with `igraph::adjacency` or `igraph::edgelist`.
+  - The `intergraph::asIgraph()` and `intergraph::asNetwork()` to go back and forth between `igraph` object and `network` object. 
+  - Transforming a directed network to a non-directed network with `symmetrize()` a sociomatrix. 
+    - `rule = "weak"`: A to B **or** B to A implies non-directed relationship.
+    - `rule = "strong"`: A to B **and** B to A implies non-directed relationship.
