@@ -123,6 +123,31 @@ knitr::opts_chunk$set(comment = NA, prompt = TRUE, collapse = TRUE)
   $$ P(y_{ij} = 1 | Y_{ij}^C) = \frac{\exp{\sum_{k = 1}^K\theta_kz_k(y)}}{c},$$
   where $\theta_k$ are the coefficients of the network statistics of interest, 
   and $c$ is a normalizing constant. 
-  - 
+  - Relationship to the logistic regression. 
+  - Homophily hypothesis, where we are testing if the same types of organizations are more likely to 
+  communicate with one another. 
+  - Hypothesis of differential homophily tests for overall homophily effect (across different dyad levels)
+  - Dyadic predictors test if ties are more likely between network members who are similar to each other
+  on some characteristic (homophily) or dissimilar (heterophily). 
+  - Relational terms (relational predictor) test either ties among network members can predict the likelihood
+  of the dependent variable tie. 
+  - Local structural predictors (dyad dependency) test the effect of local clustering (or transitivity) 
+  on the likelihood of observing a dissemination tie. 
+  - ERGMs are generally limited to cross-sectional network data. 
+  
+## Chapter 12
+  - `RSiena` combines the power of stochastic network modeling with longitudinal analysis. 
+  - `RSiena` does not use the traditional method of specifying a statistical formula. 
+  It uses a set of `RSiena` object: 
+    - `data` object: containing all network and covariate data
+    - `effects` object: containing all of the parameter effects to be included in the model
+    - `algorithm` object: controls most of the modeling options
+  - `RSiena` handles six different types of variables: 
+    - A `network` variable is the basic dependent variable in an `RSiena` model
+    - A `behavior` variable is another type of dependent variable; a node characteristic that changes over time.
+    - A `coCovar` is a constant node attribute that does not change over time
+    - A `varCovar` an attribute that does change over time. 
+    - A `coDyadCovar` is a constand dyadic covariate
+    - A `varDyadCovar` is a dyadic covariate that changes over time. 
 
   
