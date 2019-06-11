@@ -89,8 +89,40 @@ knitr::opts_chunk$set(comment = NA, prompt = TRUE, collapse = TRUE)
   - The modularity statistic can range from -0.5 to 1; the closer to 1, the more the network 
   exhibits clustering with respect to the given node grouping. 
   - Table 8.2 gives a list of functions used to detect communities.
-
+  - Use more than one community detection algorithm to compare the results.
+  
 ## Chapter 9
+  - An "affiliation" network is a network where the members are affiliated with 
+  one another based on co-membership in a group, 
+  or co-participation in some type of event. 
+  - An incidence matrix depicts how $n$ actors belong to $g$ groups. 
+  - An adjacency matrix depicts how $n$ actors interact with $n$ actors.
+  - The `weight` argument in `get.adjacency()` produces a valued adjacency matrix, 
+  where the values indicate how many ties connect any of the nodes.
+
+## Chapter 10 
+  - Random graph model; Poisson random graph model; degree distribution is Poisson
+    - $G(n, m)$ to denotes a random graph $G$ with $n$ vertices and $m$ edges
+    - $G(n, p)$ to denotes a random graph $G$ with $n$ vertices, 
+    each edge appears in the graph with probability $p$.
+    - Random graphs become entirely connected for faily low values of average degree 
+    (low levels of clustering). 
+  - Small-world model
+    - starts with a circle of nodes, then a small number of existing edges are "rewired" with probability $p$.
+    - Reduce to random graph when $p = 1$.
+  - Scale-free model uses heavy-tailed degree distributions that approximately follow a power law.
+  
+## Chapter 11
+  - Exponential random graph models (ERGMs) has at least 4 advantages:
+    - they can handle the complex dependencies of network data without the types of degeneracy problems
+    - flexible and can handle many different types of perdictors and covariates
+    - Generative
+    - Available in R (`ergm` package)
+  - Fits the conditional probability of a tie between actors $i$ and $j$ ($y_{ij} = 1$), 
+  conditional on the rest of the network (all other ties; $Y_{ij}^C$).
+  $$ P(y_{ij} = 1 | Y_{ij}^C) = \frac{\exp{\sum_{k = 1}^K\theta_kz_k(y)}}{c},$$
+  where $\theta_k$ are the coefficients of the network statistics of interest, 
+  and $c$ is a normalizing constant. 
   - 
 
   
