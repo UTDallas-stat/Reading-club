@@ -1,0 +1,208 @@
+---
+title: "R for Data Science"
+subtitle: 'Tidy Data with tidyr'
+author: "Qi Guo"
+date: "August 16, 2019"
+output:
+  ioslides_presentation: 
+    smaller: true
+always_allow_html: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(comment = NA, prompt = TRUE, tidy = FALSE, collapse = TRUE, cache = TRUE)
+library(tidyverse)
+library(modelr)
+library(nycflights13)
+options(na.action = na.warn)
+```
+
+# Part I: Introduction
+
+## Tidy Data
+
+###When we have messy datasets, there are three interrelated rules which make a dataset tidy:
+* \ 1. Each variable must have its own column.
+* \ 2. Each observation must have its own row.
+* \ 3. Each value must have its own cell.
+
+### So follow this interrelationship lead us the correspond pratical instrucations.
+
+## Package
+
+###Here we focus on the `tidyr` package, another core member of the `tidyverse`, and we'll illustrate five tables, only the first one is tidy, show how to tidy the rest of four, which are the common messy examples.
+```{r, eval=FALSE}
+library(tidyverse)
+```
+
+## Data
+```{r}
+table1
+table2
+```
+
+
+## Functions
+### We introduce kinds of functions to tidy data, like `gather`, `spread`, `separate`... in next several parts
+
+
+
+# Part II: Work with tidy data
+
+## `table1`
+
+* `table1` is tidy, it's the only representation where each column is a variable.
+* Commonly use `dplyr`, `ggplot2` in tidyverse to work with tidy data.
+```{r}
+table1 %>%
+  mutate(rate = cases/population * 10000)
+```
+
+## `table1`
+### Compute cases per year
+```{r}
+table1 %>%
+  count(year,wt=cases)
+```
+
+## Visualize changes over time
+```{r}
+library(ggplot2)
+ggplot(table1, aes(year, cases)) +
+  geom_line(aes(group = country), color = "grey50") +
+  geom_point(aes(color = country))
+```
+
+
+# Part III: Spreading and Gathering 
+
+## `gather`
+* A common problem is a dataset where some of the column names are not names of variables, but value of a variable.
+* To tidy a dataset like `table4a` and `table4b`, we need to gather those columns into a new pair of variables.
+
+```{r}
+table4a
+table4b
+```
+
+## key and value
+* The name of the variable whose values form the column names is called the key, and here it is year.
+* The name of the variable whose values are spread over the cells is called the value, and here it is the number of cases and population.
+```{r}
+(tidy4a<-table4a %>%
+  gather(`1999`,`2000`, key = "year", value = "cases"))
+tidy4b<-table4b %>%
+  gather(`1999`,`2000`, key = "year", value = "population")
+```
+
+
+## `left_join`
+* Combine the tidied versions of table4a and table4b into a single tibble, use `left_join` function.
+```{r}
+left_join(tidy4a, tidy4b)
+```
+
+## `spread`
+* When an observation is scattered acorss multiple rows, we use spread.
+* The column that contains variable names, the key column, here it's type.
+* The column that contains values forms multiple variables, the value column, here it's count
+```{r}
+table2
+```
+
+## `spread`
+```{r}
+spread(table2, key = type, value = count)
+```
+
+
+# Part IV: Separating and Pull
+
+## `separate`
+* separate() pulls apart one column into multiple columns, by spliting wherever a separator character appears.
+```{r}
+table3
+table3 %>%
+  separate(rate, into = c("case","population"))
+```
+
+## `separate`
+* separate() will split values wherever it sees a nonalphanumeric character, and here we can rewrite the preceding code as: 
+```{r,eval=FALSE}
+table3 %>%
+  separate(rate, into = c("case","population"), seq = "/")
+```
+* But it leaves the type of the column as is, so try to convert to better types using convert = TRUE
+```{r}
+table3 %>%
+  separate(rate, into = c("case","population"), convert = TRUE)
+```
+
+## `separate`
+* And we can also interpret the integers as positions to split at.
+```{r}
+table3 %>%
+  separate(year, into = c("case","population"), sep = 2)
+```
+
+## `unite`
+* unite() combines multiple columns into a single column
+```{r}
+table5
+table5 %>%
+  unite(new,century,year)
+```
+
+## `unite`
+* The default will place an underscore(_) between the values from different columns.
+```{r}
+table5 %>%
+  unite(new,century,year, sep = "")
+```
+
+## Exercises
+* Here let's pull together everything to tackle a realistic data tidying problem. The `tidyr::who` dataset contains tuberculosis(TB) cases broken down by year, country, age, gender, and diagnosis method. There's a wealth of epidemiological information in this dataset, but it's challenging to work with the data in the form that it's provided:
+```{r}
+who
+```
+
+## Exercises
+### Now follow the instructions to tidy the data:
+* The country, iso2, iso3 are three variables that redundantly specify the country.
+* Make a minor fix to the format of the column names replace the characters "newrel" with "new_rel"
+* The variable names(e.g., new_sp_m014, new_ep_m014, new_ep_f014) these are likely to be values, not variables.
+* For one of these varibale names, the first three letters of each column denote whether the column contains new or old cases of TB.In this datasetm each column contains new cases.
+* The next two letters describe the type of TB.
+* The sixth letter gives the sex of TB patients. The dataset groups cases by males(m) and females(f).
+* The remaining numbers give the age group(e.g., 014=0-14 years old,1524=15-24 years old,65=65 or older)
+ 
+## Solution
+```{r}
+who %>%
+  gather(code, value, new_sp_m014:newrel_f65, na.rm = TRUE) %>%
+  mutate(
+    code = stringr::str_replace(code, "newrel", "new_rel")
+  ) %>%
+  separate(code, c("new","var","sexage")) %>%
+  select(-new,-iso2,-iso3) %>%
+  separate(sexage, c("sex", "age"), sep = 1)
+```
+
+# Part V: Brainstorm
+##`gather()`
+```{r}
+table4a %>%
+  gather('1999','2000', key = "year", value = "cases")
+```
+
+##`gather()`
+```{r}
+table4a %>%
+  gather(year,cases,-country)
+```
+
+##`gather()`
+```{r}
+table4a %>%
+  gather("year", "cases",'1999':'2000')
+```

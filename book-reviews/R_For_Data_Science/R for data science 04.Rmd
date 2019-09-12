@@ -1,0 +1,343 @@
+---
+title: "R for Data Science"
+subtitle: 'Functions'
+author: "Qi Guo"
+date: "August 17, 2019"
+output:
+  ioslides_presentation: 
+    smaller: true
+always_allow_html: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(comment = NA, prompt = TRUE, tidy = FALSE, collapse = TRUE, cache = TRUE)
+library(tidyverse)
+library(lubridate)
+library(modelr)
+options(na.action = na.warn)
+```
+
+# Part I: Introduction
+
+## Write a Function
+
+* When we copied and pasted a block of code more than twice, it's recommend to write a function to replace them. For example:
+```{r}
+df<- tibble::tibble(
+  a = rnorm(10),
+  b = rnorm(10),
+  c = rnorm(10),
+  d = rnorm(10)
+)
+df$a <- (df$a - min(df$a, na.rm = TRUE)) / 
+  (max(df$a, na.rm = TRUE) - min(df$a, na.rm = TRUE))
+df$b <- (df$b - min(df$b, na.rm = TRUE)) / 
+  (max(df$b, na.rm = TRUE) - min(df$b, na.rm = TRUE))
+df$c <- (df$c - min(df$c, na.rm = TRUE)) / 
+  (max(df$c, na.rm = TRUE) - min(df$c, na.rm = TRUE))
+df$d <- (df$d - min(df$d, na.rm = TRUE)) / 
+  (max(df$d, na.rm = TRUE) - min(df$d, na.rm = TRUE))
+```
+
+## Write a Function
+
+* There is some duplication in this code, it makes sense to do it in one step:
+```{r}
+x <- df$a
+rng<- range(x, na.rm = TRUE)
+(x - rng[1]) / (rng[2] - rng[1])
+```
+* One more step, pulling out the outcome into a function:
+```{r}
+rescale01 <- function(x){
+rng<- range(x, na.rm = TRUE)
+(x - rng[1]) / (rng[2] - rng[1])
+}
+rescale01(c(0,5,10))
+```
+
+## Infinte values
+
+* One of the advantage of functions is that if our requirements change, we only need to make the change in one place. For example:
+```{r}
+x <- c(1:10, Inf)
+rescale01(x)
+```
+* Here we have to control the function to make `Inf` allowed.
+```{r}
+rescale01 <- function(x){
+  rng <- range(x, na.rm = TRUE,  finite = TRUE)
+  (x - rng[1]) / (rng[2] - rng[1])
+}
+rescale01(x)
+```
+
+## Exericses
+* \ 1. Write a function to find the proportional of missing values.
+```{r,echo = FALSE}
+prop_miss <- function(x) {
+  mean(is.na(x))
+}
+```
+
+```{r}
+prop_miss(c(1:9, NA))
+```
+
+* \ 2. Here we have `a`,`b`,`c`,`d` four vectors in tibble `df`, that means we have to use the function `rescale01` four times, is there any way to reduce the duplication?
+
+#Part II `which` & `stopifnot`
+
+## which()
+* which():  give the TRUE indices of a logical object, allowing for array indices. For example:
+```{r}
+which(LETTERS == "R")
+which(ll <- c(TRUE, FALSE, TRUE, NA, FALSE, FALSE, TRUE))
+names(ll) <- letters[seq(ll)]
+which(ll)
+```
+
+## stopifnot()
+* stopifnot():If any of the expressions (in ... or exprs) are not all TRUE, stop is called, producing an error message indicating the first expression which was not (all) true. For example:
+```{r,eval=FALSE}
+both_na <- function(x, y) {
+  stopifnot(length(x) == length(y))
+  which(is.na(x) & is.na(y))
+}
+both_na(c(1, 2, NA, 2, NA), c(1, 2, 3, 4, NA))
+both_na(c(1,2,NA),c(1,2,3,NA))
+```
+
+
+# Part III Multiple Conditions
+## `if` 
+
+* The commonly used `if` function is:
+```{r, eval=FALSE}
+if(this){
+  # do that
+} else if (that){
+  # do something else
+} else {
+  #
+}
+```
+
+* Example: Write a greeting function that says "good morning", "good afternoon", or "good evening", depending on the time of day.(Hint: use a time argument that defaults to lubridate::now())
+
+## Example
+```{r}
+greeter <- function(now = now()) {
+  if (between(hour(now), 6, 12)) {
+    print("Good morning")
+  } else if (between(hour(now), 12, 18)) {
+    print("Good afternoon")
+  } else {
+    print("Good evening")
+  }
+}
+greeter(now())
+```
+
+## Exercises
+* 1. Implement a `fizzbuzz` function. If the number is divisible by three, it returns "fizz", If it's divisible by five it returns "buzz". If it's divisible by three and five, it returns "fizzbuzz". Otherwise, it returns the number.
+```{r, echo=FALSE}
+fizzbuzz <- function(x) {
+  by_three <- x %% 3 == 0
+  by_five <- x %% 5 == 0
+  
+  if (by_three && by_five) {
+    return("fizzbuzz")
+  } else if (by_three) {
+    return("fizz")
+  } else if (by_five) {
+    return("buzz")
+  } else {
+    return(x)
+  }
+}
+```
+
+```{r}
+sapply(1:20, fizzbuzz)
+```
+
+## Exercises
+* \ 2.How could you use cut() to simplify this set of nested if-else statements?
+```{r, eval=FALSE}
+if(temp <= 0){
+"freezing"
+  }else if(temp <=10){
+"cold"
+  }else if(temp <=20){
+"cool"    
+  }else if(temp <=30){
+"warm"    
+  }else{
+"hot"
+  }
+```
+
+```{r}
+temp<-10
+cut(temp, breaks = seq(-10,40,10),
+    labels = c("freezing", "cold", "cool", "warm", "hot"))
+```
+
+# Part IV: Function in Statistics
+
+## Confidence Interval
+* There are lots of functions in statistics, here introduces a confidence interval around mean using normal approximation and linear models function.
+* Start with a 95% CI.
+```{r}
+mean_ci <- function(x, conf = 0.95)
+{
+  se<-sd(x)/sqrt(length(x))
+  alpha<-1-conf
+  mean(x)+se*qnorm(c(alpha/2,1-alpha/2))
+}
+x<-runif(100)
+mean_ci(x)
+```
+* If control the conf:
+```{r}
+mean_ci(x, conf = 0.99)
+```
+
+## Linear Models
+* There are different ways to estimate a random variable in statistics, for example, the least squares estimate, the maximum likelihood estimate, which are the most commonly used method. Here we talk about the Newton-Raphson method, and then introduce the `optim` function.
+```{r}
+# First get the predict value for the model
+model1<- function(a,data){
+a[1] + data$x * a[2]
+}
+model1(c(7,1.5),sim1)
+```
+
+```{r}
+#Compute the root-mean-squared deviation
+measure_distance <- function(mod, data){
+  diff<- data$y - model1(mod, data)
+  sqrt(mean(diff^2))
+}
+measure_distance(c(7,1.5),sim1)
+```
+
+## `optim` function
+```{r}
+# The intuition of Newton-Raphson is pick a starting point and look around for 
+# the steepest slope, and then ski down that slope a little way, and then repeat
+# again and again until can't go any lower
+best<-optim(c(0,0),measure_distance, data=sim1)
+best$par
+```
+* For optim() here, if we have a function that defines the distance between a model and a dataset, and an algorithm that can minimize that distance by modifying the parameters of the model, we can find the best model.
+
+
+## `lm` function
+```{r}
+sim1_mod <- lm(y ~ x, data = sim1)
+coef(sim1_mod)
+```
+
+* There are pretty close, but `lm()` doesn't use `optim()` but instead takes advantage of the mathematical structure of linear models, the `lm()` actually finds the closest model in a single step, using a sophisticated algorithm.
+
+
+# Part IV: Checking Values
+
+## Example
+* Sometimes when we forget exactly how our functions works or make our function robust. It's a good choice to make constraints explicit. For example:
+
+```{r}
+wt_mean <- function(x, w) {
+  sum(x * w) / sum(x)
+}
+wt_var <- function(x, w){
+  mu <- wt_mean(x,w)
+  sum(w * (x - mu) ^ 2) / sum(w)
+}
+wt_sd <- function(x, w){
+  sqrt(wt_var(x, w))
+}
+```
+* When `x` and `w` are not the same length, we don't get an error because of R's vector recycling rule.
+```{r}
+wt_mean(1:6, 1:3)
+```
+
+## Update
+* So here it's good practice to check important preconditions, and throw an error if they are not true:
+```{r}
+wt_mean <- function(x, w){
+  if (length(x) != length(w)){
+    stop("`x` and `w` must be the same length", call. =  FALSE)
+  }
+  sum(w * x) / sum(x)
+}
+```
+* Now use the example before.
+```{r, eval=FALSE}
+wt_mean(1:6, 1:3)
+```
+
+```{r, out.width = "560px", echo = FALSE, fig.align = 'center'}
+knitr::include_graphics("002.png")
+```
+
+## Exercise
+* Write a more robust `wt_mean` function to control the missing value(`NA`) in dataset avaiable or not.
+```{r}
+wt_mean <- function(x,w,na.rm = FALSE) {
+  stopifnot(is.logical(na.rm), length(na.rm) ==1)
+  stopifnot(length(x)==length(w))
+  
+  if(na.rm){
+    miss <- is.na(x) | is.na(w)
+    x <- x[!miss]
+    w <- w[!miss]   
+  }
+  sum(w*x)/sum(x)
+}
+```
+
+```{r}
+wt_mean(1:6, c(5:1,NA),na.rm = FALSE)
+wt_mean(1:6, c(5:1,NA),na.rm = TRUE)
+```
+
+```{r, eval = FALSE}
+wt_mean(1:6, 6:1,na.rm = "foo")
+```
+
+# Part V: Brainstorm
+## An example in survival analysis
+* How to write get the m.l.e of Weibull parameters for a single group of survival data by using the `optim()` function. 
+
+```{r, eval = FALSE}
+logLikWeib <- function(par, tt, status) { 
+   mu <- par[1]
+   sigma <- par[2]
+   lambda.p <- exp(-mu)
+   alpha.p <- 1/sigma
+   dd <- sum(status)
+   sum.t <- sum(status*log(tt))
+   sum.t.alpha <- sum(tt^alpha.p)
+   term.1 <- dd*log(alpha.p) + alpha.p*dd*log(lambda.p)
+   term.2 <- (alpha.p - 1)*sum.t
+   term.3 <- (lambda.p^alpha.p)*sum.t.alpha
+   result <- term.1 + term.2 - term.3
+result 
+}
+```
+## An example in survival analysis
+The starting values are the estimates of $\mu \ and \ \sigma$ in linear regressions.
+```{r, eval = FALSE}
+result <- optim(par=c(4.568, 2.280), fn=logLikWeib, method= "L-BFGS-B",
+lower=c(0.001, 0.01), upper=c(5, 5), control=list(fnscale = -1),
+tt=ttr, status=relapse)
+```
+This is actually the function `survreg` in the `survival` package, which yields the same parameter estimates:
+```{r, eval=FALSE}
+result.survreg.0 <- survreg(Surv(ttr, relapse) ~ 1, dist="weibull")
+summary(result.survreg.0)
+```

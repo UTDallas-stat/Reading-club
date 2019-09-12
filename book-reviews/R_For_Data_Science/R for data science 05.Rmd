@@ -1,0 +1,243 @@
+---
+title: "R for Data Science"
+subtitle: 'Iteration with purrr'
+author: "Qi Guo"
+date: "August 19, 2019"
+output:
+  ioslides_presentation: 
+    smaller: true
+always_allow_html: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(comment = NA, prompt = TRUE, tidy = FALSE, collapse = TRUE, cache = TRUE)
+library(tidyverse)
+library(modelr)
+options(na.action = na.warn)
+```
+
+# Part I: Introduction
+
+## Reduce Duplication
+
+* In `Functions`, if we copied and pasted a block of code more than twice, it's recommend to write a function to replace them, actually the loops is a kind of function, another tool for reducing duplication. For example:
+
+```{r}
+df<- tibble(
+  a =  rnorm(10),
+  b =  rnorm(10),
+  c =  rnorm(10),
+  d =  rnorm(10)
+)
+```
+
+* To find a median of each column.
+```{r}
+median(df$a)
+median(df$b)
+median(df$c)
+median(df$d)
+```
+
+
+# Part II: For Loops
+
+## For loops
+
+* A common template for loop:
+```{r}
+output <- vector("double", ncol(df))    # 1. output
+for (i in seq_along(df))  {             # 2. sequence
+  output[[i]] <- median(df[[i]])        # 3. body
+}
+output
+```
+
+* In `Functions`, that question in `Exercises` can write in:
+```{r}
+rescale01 <- function(x){
+rng<- range(x, na.rm = TRUE)
+(x - rng[1]) / (rng[2] - rng[1])
+}
+
+for (i in seq_along(df)){
+  df[[i]] <- rescale01(df[[i]])
+}
+```
+
+## Exercise
+* 1.Write a for loop to compute different types of functions for a dataset. 
+```{r}
+looper <- function(the_type, object, fun) {
+  empty_vec = vector(the_type, length(object))
+  for (every_column in seq_along(object)) {
+    empty_vec[every_column] <- fun(object[[every_column]])  
+  }
+  empty_vec
+}
+```
+* So if we would like to compute the mean of every column in `mtcars`
+```{r}
+looper("numeric", mtcars, mean)
+```
+* determine the type of each column in `nycflights13::flights`
+```{r, warning=FALSE}
+looper("character", nycflights13::flights, class)
+```
+
+## Exercise
+* \ 2. Write a function that prints the mean of each numeric column in a data frame, along with its name. For examplem, `show_mean(iris)` would print:
+```{r, eval= FALSE}
+show_mean(iris)
+#> Sepal.Length: 5.84
+#> Sepal.Width: 3.06
+#> Petal.Length: 3.76
+#> Petal.Width: 1.20
+```
+
+```{r}
+show_means <- function(x) {
+  the_class <- vector("logical", length(x))
+  for (i in seq_along(x)) the_class[[i]] <- is.numeric(x[[i]])
+  x <- x[the_class]
+  for (i in seq_along(x)) {
+    cat(paste0(names(x)[i], ": ", round(mean(x[[i]]), 2)), fill = TRUE) 
+  }
+}
+show_means(iris)
+```
+
+# Part III: The Map Functions
+
+## The suffix of map function
+#### The type of the vector is determined by the suffix to the map function:
+* `map()` makes a list.
+* `map_lgl()` makes a logical vector.
+* `map_int()` makes a integer vector.
+* `map_dbl()` makes a double  vector.
+* `map_chr()` makes a character vector.
+```{r}
+map_dbl(df, mean)
+```
+ or
+```{r}
+df %>% map_dbl(mean)
+```
+
+## Shortcuts
+* There are a few shortcuts that use with `.f` in order to save a little typing. For example:
+```{r}
+models <- mtcars %>%
+  split(.$cyl) %>%
+  map(function(df) lm(mpg ~ wt, data = df))
+```
+* The syntax for creating an anonymous function in R is quite verbose so `purrr` provides a convenient shortcut:
+```{r}
+models <- mtcars %>%
+  split(.$cyl) %>%
+  map(~lm(mpg~ wt, data = .))
+```
+
+## Exercise 
+
+* \ 1.Now use the `map()` to determine the type of each column in `nycflights13:flights`.
+```{r, echo=FALSE}
+map(nycflights13::flights, class)
+```
+
+
+## Exercise 
+* \ 2.Write a function compute the number of unique values in each column of `iris`.
+```{r}
+map(iris, ~length(unique(.)))
+map(iris, function(x) sum(table(unique(x))))
+```
+
+## Mapping over Multiple Arguments
+* When the input is not a single one, `map2()` and `pmap()` are recommended to use. For example:
+```{r}
+mu <- list(5, 10, -3)
+mu %>%
+  map(rnorm, n = 5) %>%
+  str()
+```
+* If we want to vary the standard deviation.
+```{r}
+sigma <- list(1, 5, 10)
+seq_along(mu) %>%
+  map(~rnorm(5, mu[[.]], sigma[[.]])) %>%
+  str()
+```
+
+## `map2()`
+* Use the `map2()`.
+```{r}
+map2(mu, sigma, rnorm, n = 5) %>% str()
+```
+
+* Actually `map2()` is just a wrapper around a for loop:
+```{r, eval=FALSE}
+map2 <- function(x, y, f, ...){
+  out <- vector("list", length(x))
+  for (i in seq_along(x)){
+    out[[i]] <- f(x[[i]], y[[i]], ...)
+  }
+  out
+}
+```
+
+
+## `pmap()`
+* When we take a list of arguments, like vary the mean, standard deviation, and number of samples.
+```{r}
+n <- list(1,3,5)
+args1 <- list(n, mu, sigma)
+args1 %>%
+  pmap(rnorm) %>% 
+  str()
+```
+
+## Invoking Different Functions
+* If we might also vary the function itself, use `invoke_map()` function.
+```{r}
+f <- c("runif", "rnorm", "rpois")
+param <- list(
+  list(min = -1, max = 1),
+  list(sd = 5),
+  list(lambda = 10)
+)
+invoke_map(f, param, n=5) %>% str()
+```
+
+
+# Part IV: Brainstorm
+## Write a function to keep the numeric columns in a dataset.
+```{r}
+df <- tribble(
+~x, ~y, ~z,
+"a", 2, 3.6,
+"b", 1, 8.5
+)
+df
+```
+
+```{r}
+the_class <- vector("logical", length(df))
+for (i in seq_along(df)) the_class[[i]] <- is.numeric(df[[i]])
+   df1 <- df[the_class]
+   df1
+```
+
+
+## Write a function to keep the numeric columns in a dataset.
+```{r}
+is_num <- sapply(df, is.numeric)
+df2 <- df[, is_num]
+df2
+```
+
+```{r}
+# `detect` function
+df3<- keep(df, is.numeric)
+df3
+```
