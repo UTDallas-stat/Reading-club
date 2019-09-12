@@ -1,0 +1,391 @@
+---
+title: "R for Data Science"
+subtitle: 'Data Transformation with dplyr'
+author: "Qi Guo"
+date: "April 24, 2019"
+output:
+  ioslides_presentation: 
+    smaller: true
+always_allow_html: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(comment = NA, prompt = TRUE, tidy = FALSE, collapse = TRUE, cache = TRUE)
+library(tidyverse)
+library(nycflights13)
+library(modelr)
+options(na.action = na.warn)
+```
+
+# Part I: Introduction
+
+## Transformation
+
+###Often we need to create some new variables or summarises, or maybe rename the variables or reorder the observations in order to make the data a little easier to work with
+
+
+## Package
+
+###Here we focus on the `dplyr` package, another core member of the `tidyverse`, and we'll illustrate the key ideas using data from the `nycflights13` package, and use `ggplot2` to help us understand the data.
+```{r, eval=FALSE}
+library(nycflights13)
+library(tidyverse)
+```
+
+## Data
+```{r}
+flights %>% print(width = Inf)
+```
+
+## Functions
+### We introduce kinds of functions to transform data, like `filter`, `arrange`, `summarise`... in next several parts
+
+# Part II: filter
+
+## `filter`
+
+### `filter` allows you to subset observations based on their values.
+### For example: select all flights on January 1st
+```{r}
+filter(flights, month==1, day==1)
+```
+
+## Comparison
+### Computers use finite precision arithmetic, so every number we see is an approximation. Instead of relying on `==`, use `near`:
+```{r}
+sqrt(2)^2==2
+near(sqrt(2)^2,2)
+1/49 *49==1
+near(1/49 *49,1)
+```
+
+## x %in% y
+### Select every row where x is one of the values in y
+### For example: select all flights that departed in November or December
+```{r}
+filter(flights, month %in% c(11,12))
+```
+
+## Different logical operators
+### `&` is "and", `|` is "or", and `!` is "not"
+### For example: select flights that weren't delayed by more than two hours
+```{r}
+f1<-filter(flights,!(arr_delay > 120|dep_delay>120))
+# or
+f2<-filter(flights, arr_delay <= 120, dep_delay <= 120)
+identical(f1,f2)
+```
+
+
+## Missing Values
+### `NA` represents an unknown value so missing values are "contagious"; almost any operation involving an unknown value will also be unknown
+```{r}
+NA > 5
+10 == NA
+NA == NA
+```
+### Check if a value is missing, use `is.na`
+```{r}
+x <- NA
+is.na(x)
+```
+
+## `NA` in `filter`
+### `filter` only includes rows where the condition is `TRUE`; it exculdes both `NA` and `FALSE` values, ask for them explicitly if we want to preserve missing values
+```{r}
+df<- tibble(x=c(1,NA,3))
+filter(df,x>1)
+filter(df,is.na(x) | x>1)
+```
+
+## `between`
+###filter the observations between two values
+### For example, find all flights departed between midnight and 6 a.m(inclusive)
+```{r}
+f3<-filter(flights, !(dep_time >= 2400| dep_time <=600))
+f4<-filter(flights, between(dep_time, 601, 2359))
+identical(f3,f4)
+```
+
+## Exercise 1
+
+###1. Finds all flights departed in summer(July, August, and September)
+
+\
+
+
+###2.How many flights have a missing `dep_time`? What other variables are missing?
+
+
+## Solution
+
+###Q1. Finds all flights departed in summer(July, August, and September)
+```{r}
+filter(flights, month %in% c(7:9))
+```
+
+##Q2 How many flights have a missing `dep_time`?
+```{r}
+sum(is.na(flights$dep_time))
+```
+```{r}
+#or
+flights %>% select(dep_time) %>%
+  is.na() %>% sum()
+#or
+flights %>% select(dep_time) %>%
+  summarise(missing = sum(is.na(dep_time)))
+```
+
+## What other variables are missing?
+
+###`map_dbl` function:transform their input by applying a function to each element and returning a vector the same length as the input
+```{r}
+map_dbl(flights, ~ sum(is.na(.x)))
+```
+
+# Part III: arrange
+
+## `arrange`
+
+### `arrange` reorder the rows, `-` means desc
+### It takes a data frame and a set of column names to order by, if provide more than one column name, each additional column will be used to break ties in the values of preceding columns
+### For example: reorder the flights by year, month and day
+```{r, eval=FALSE}
+arrange(flights,year,month,day)
+```
+
+## `arrange`
+```{r, echo = FALSE}
+arrange(flights,year,month,day)
+```
+## Missing values
+### Missing values are always sorted at the end
+```{r}
+df<- tibble(x=c(5,2,NA))
+df
+arrange(df,x)
+arrange(df,desc(x))
+```
+
+## Exercise 2
+###1. How could we use `arrange` to sort all missing values to the start?
+```{r}
+df[order(is.na(df$x),decreasing= TRUE),]
+
+arrange(df, desc(is.na(x)))
+```
+
+# Part IV: select
+
+## `select`
+
+### `select` pick variables by their names
+### For example: select columns by name
+```{r}
+select(flights, year, month, day) %>%
+  head(5)
+#or
+select(flights, year:day) %>%
+  head(5)
+```
+
+## Examples
+### Select all columns except those from year and day(inclusive)
+```{r}
+select(flights, -(year:day)) %>%
+  head(10)
+```
+
+## Examples
+### Select all columns contains "time"
+```{r}
+select(flights,contains("time")) %>%
+  head(10)
+```
+
+## `rename`
+### rename variables
+```{r}
+rename(flights, tail_num = tailnum)
+```
+
+## `everything`
+### Use it to move a handful of variables to the start of the data frame
+```{r}
+select(flights, flight, everything())
+```
+
+# Part V: summarise
+
+## `summarise` or `summarize`
+
+### `select` collapses a data frame to a single row
+### For example: find the mean of `dep_delay`
+```{r}
+#na.rm = TRUE can excluding missing values from analysis
+summarize(flights, delay=mean(dep_delay, na.rm=TRUE))
+summarize(flights, delay=mean(dep_delay))
+#group_by(summarize() is not terribly useful unless we pair it with group_by())
+by_day <- group_by(flights, year, month, day)
+summarise(by_day, delay=mean(dep_delay, na.rm=TRUE))
+```
+
+## `count`
+### count the dest
+```{r}
+not_cancelled<-flights %>%
+  filter(!is.na(dep_delay), !is.na(arr_delay))
+not_cancelled %>%
+  count(dest)
+```
+
+## `count`
+###count the total number of miles a plane flew
+```{r}
+not_cancelled %>%
+  count(tailnum, wt = distance)
+```
+
+## Exercise 3
+### Q1.Find the average of `dep_delay` for each dates
+```{r}
+flights %>%
+  group_by(year, month, day) %>%
+  summarize(mean = mean(dep_delay, na.rm = TRUE))
+```
+
+## Exercise 3
+### Q2. Why is distance to some destinations more variable than to others?
+```{r}
+not_cancelled %>%
+  group_by(dest)%>%
+  summarise(distance_sd=sd(distance))%>%
+  arrange(desc(distance_sd))
+```
+
+## Exercise 3
+### Q3. What proportion of flights are delayed by more than one hour?
+```{r}
+not_cancelled %>%
+  group_by(year, month, day)%>%
+  summarise(hour_perc = mean(arr_delay > 60))
+```
+
+## Exercise 3
+### Q4. Plot the proportion of cancelled flights related to the average delay
+```{r, eval = FALSE}
+flights %>%
+  group_by(day) %>%
+  summarise(cancelled = mean(is.na(dep_delay)),
+            mean_dep = mean(dep_delay, na.rm = T),
+            mean_arr = mean(arr_delay, na.rm = T)) %>%
+  ggplot(aes(y = cancelled)) +
+  geom_point(aes(x = mean_dep), colour = "red") +
+  geom_point(aes(x = mean_arr), colour = "blue") +
+  labs(x = "Avg delay per day", y = "Cancelled flights p day")
+```
+
+## Exercise 3
+```{r, echo = FALSE}
+flights %>%
+  group_by(day) %>%
+  summarise(cancelled = mean(is.na(dep_delay)),
+            mean_dep = mean(dep_delay, na.rm = T),
+            mean_arr = mean(arr_delay, na.rm = T)) %>%
+  ggplot(aes(y = cancelled)) +
+  geom_point(aes(x = mean_dep), colour = "red") +
+  geom_point(aes(x = mean_arr), colour = "blue") +
+  labs(x = "Avg delay per day", y = "Cancelled flights p day")
+```
+
+## Exercise 3
+### Q5.Explore the relationship between the distance and average delay for each location
+```{r, eval = FALSE}
+by_dest <- group_by(flights, dest)
+delay<- summarise(by_dest,
+                  count=n(),
+                  dist=mean(distance,na.rm=TRUE),
+                  delay=mean(arr_delay,na.rm=TRUE)
+)
+delay<-filter(delay, count>20, dest!="HNL")
+
+ggplot(delay,mapping = aes(dist,delay))+
+  geom_point(aes(size=count),alpha=1/3)+
+  geom_smooth(se=FALSE)
+```
+
+## Exercise 3
+```{r, echo = FALSE}
+by_dest <- group_by(flights, dest)
+delay<- summarise(by_dest,
+                  count=n(),
+                  dist=mean(distance,na.rm=TRUE),
+                  delay=mean(arr_delay,na.rm=TRUE)
+)
+delay<-filter(delay, count>20, dest!="HNL")
+
+ggplot(delay,mapping = aes(dist,delay))+
+  geom_point(aes(size=count),alpha=1/3)+
+  geom_smooth(se=FALSE)
+```
+
+
+# Part VI: Brainstorm
+
+##Find the top 10 data
+
+###Find the 10 most delayed flights using a `ranking` function.  
+```{r}
+flights %>%
+  filter(min_rank(-(dep_delay)) %in% 1:10)
+```
+
+##Find the top 10 data
+
+###Find the 10 most delayed flights using a `top_n` function
+```{r}
+flights %>%
+  top_n(10, dep_delay)
+```
+
+
+##Find the top 10 data
+
+###Find the 10 most delayed flights using a `head` function
+```{r}
+flights %>%
+  arrange(-(dep_delay)) %>%
+  head(10)
+```
+
+##Find the top 10 data
+
+###Find the 10 most delayed flights using a `head` function
+```{r}
+flights %>%
+  mutate(ID = seq_along(dep_delay)) %>%
+  select(ID, everything()) %>%
+  arrange(-(dep_delay)) %>% 
+  head(10)
+```
+
+##Find the top 10 data
+
+###Find the rank 10th delayed flights using a `filter` function
+```{r}
+#If you want to find the rank first or last, we can use min() & first()
+#or max() & last()
+flights %>%
+ arrange(-(dep_delay)) %>%
+  filter(1:n()==10)
+```
+
+## For min and max, use `range`
+```{r}
+flights %>%
+  filter(!is.na(dep_delay), !is.na(arr_delay)) %>%
+  group_by(year, month, day) %>% 
+ mutate(r = min_rank(desc(dep_time))) %>%
+  filter(r %in% range(r))
+```
