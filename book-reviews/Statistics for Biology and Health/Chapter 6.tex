@@ -1,0 +1,394 @@
+\documentclass{beamer}
+
+% Some common packages
+\usepackage{graphicx, color}
+\usepackage{alltt}
+\usepackage{booktabs, calc, rotating}
+\usepackage{natbib}
+\usepackage{multicol}
+\usepackage{amsmath, amsbsy, amssymb, amsthm, graphicx}
+\usepackage[english]{babel}
+\usepackage{xkeyval} 
+\usepackage{xfrac}
+\usepackage[normalem]{ulem}
+\usepackage{fancyvrb} 
+\usepackage{tikz, geometry, tkz-graph, xcolor}
+\usepackage[latin1]{inputenc}
+\usepackage{times}
+\usepackage[T1]{fontenc}
+
+% Some shortcuts
+\newcommand{\cov}{\mathrm{cov}}
+\newcommand{\dif}{\mathrm{d}}
+\newcommand{\bigbrk}{\vspace*{2in}}
+\newcommand{\smallbrk}{\vspace*{.1in}}
+\newcommand{\midbrk}{\vspace*{1in}}
+\newcommand{\red}[1]{{\color{red}#1}}
+\newcommand{\blue}[1]{{\color{blue}#1}}
+\newcommand{\green}[1]{{\color{green}#1}}
+\newcommand{\calc}[1]{{\fbox{\mbox{#1}}}}
+\newcommand{\Var}{\mathrm{Var}}%
+\newcommand{\Cov}{\mathrm{Cov}}%
+
+\usetheme[numbering=fraction, progressbar = frametitle]{metropolis}
+% section page?
+% \usetheme[sectionpage=none]{metropolis}
+% place progressbar under frametitle?
+% \usetheme[progressbar = frametitle]{metropolis}
+
+
+
+% To center title?
+\setbeamertemplate{title page}[default]
+% To add a rectangle box for title?
+% \setbeamercolor{titlelike}{parent = frametitle}   
+
+% item color and shape
+% \setbeamertemplate{itemize item}{\color{mDarkTeal}$\bullet$}
+% \setbeamertemplate{itemize subitem}{\color{mDarkTeal}$\bullet$}
+% \setbeamertemplate{itemize subsubitem}{\color{mDarkTeal}$\bullet$}
+
+% UTD colors
+\definecolor{warmgray10}{RGB}{118,106,98}
+\definecolor{warmgray2}{RGB}{213,210,202}
+\definecolor{warmgray1}{RGB}{230,230,230}
+\definecolor{flameOrange}{RGB}{199,91,18}
+\definecolor{ecoGreen}{RGB}{0,133,86}
+
+% only change item color 
+\setbeamercolor*{itemize item}{fg = mDarkTeal}
+\setbeamercolor*{itemize subitem}{fg = mDarkTeal}
+\setbeamercolor*{itemize subsubitem}{fg = mDarkTeal}
+% enumerate color
+\setbeamercolor*{enumerate item}{fg = mDarkTeal}
+\setbeamercolor*{enumerate subitem}{fg = mDarkTeal}
+\setbeamercolor*{enumerate subsubitem}{fg = mDarkTeal}
+% description color
+\setbeamercolor*{description item}{fg = mDarkTeal}
+\setbeamercolor*{description subitem}{fg = mDarkTeal}
+\setbeamercolor*{description subsubitem}{fg = mDarkTeal}
+
+% define blocks
+\newenvironment<>{problock}[1]{
+  \begin{actionenv}#2
+    \def\insertblocktitle{#1}
+    \par
+    \mode<presentation>{
+      \setbeamercolor{block title}{fg = white, bg = ecoGreen} %mDarkTeal}
+      \setbeamercolor{block body}{fg = black, bg = warmgray1}
+    }
+    \usebeamertemplate{block begin}}
+  {\par\usebeamertemplate{block end}\end{actionenv}}
+
+\newenvironment<>{defblock}[1]{
+  \begin{actionenv}#2
+    \def\insertblocktitle{#1}
+    \par
+    \mode<presentation>{
+      \setbeamercolor{block title}{fg = white,bg = flameOrange} %mDarkBrown}
+      \setbeamercolor{block body}{fg = black,bg = warmgray1}
+    }
+    \usebeamertemplate{block begin}}
+  {\par\usebeamertemplate{block end}\end{actionenv}}
+
+% \setbeamerfont{block title}{size={}}
+% \setbeamercolor{titlelike}{parent=structure,bg=flameOrange!80!black,fg=white} % title
+\mode
+<all>
+
+% fancy for Verbatim?
+\fvset{frame = single, framesep = 1mm,fontfamily = courier,
+  fontsize = \scriptsize, numbers = left, framerule = .3mm,
+  numbersep = 1mm,commandchars = \\\{\}}
+
+% reset text width
+\setbeamersize{text margin left = 5pt,text margin right = 5pt}
+
+\title[Short title]{Statistics for Biology and Health\\ Chapter 6 Hypothesis Testing\\ 
+}
+\author[Author name]{Qi Guo}
+% \institute[UTD]{Department of Mathematical Sciences \\ The University of Texas at Dallas}
+\date{July 21,2019}
+% UTD logo on title page
+% \titlegraphic{\includegraphics[width=5cm]{mono_nsm_print_header.jpg}}
+\titlegraphic{\includegraphics[scale = .27]{UTDmono_NSM_header_RGB-1.png}}
+
+\begin{document}
+
+% default title thicker line
+% need to adjust
+% \frame{
+% \maketitle
+% \begin{tikzpicture}[remember picture, overlay]
+%   \def\xmargin{.1cm}     % Left and right margin of the title line
+%   \def\yshift{-0.1cm}   % Moves the title line upwards (-1.25cm moves title line downwards)
+%   \draw[mLightBrown,line width=2pt] (current page.west) ++(\xmargin,\yshift) -- ++({\paperwidth-2*\xmargin},0);
+% \end{tikzpicture}
+% }
+
+\frame{
+  \vspace{1cm}
+  \maketitle
+  \begin{tikzpicture}[remember picture, overlay]
+    \def\xmargin{.8cm}     % Left and right margin of the title line
+    \def\yshift{0.6cm}   % Moves the title line upwards 
+    \draw[mLightBrown,line width=2.2pt] (current page.west) ++(\xmargin,\yshift) -- ++({\paperwidth-2*\xmargin},0);
+  \end{tikzpicture}
+}
+
+
+% Set up UTD backgroud
+% Show background from here on
+\setbeamercolor*{item}{fg=red}
+\bgroup
+\usebackgroundtemplate{
+  \tikz[overlay,remember picture] \node[opacity=0.05, at=(current page.center)] {
+    \includegraphics[height=\paperheight,width=\paperwidth]{UTDbg}};}
+
+
+\begin{frame}{Contents}
+  \setbeamertemplate{section in toc}[sections numbered]
+  \tableofcontents[hideallsubsections]
+\end{frame}
+
+\section{Introduction}
+\begin{frame}{Introduction}
+\begin{itemize}
+\item In this chapter, we focus on hypothesis tests that are based on comparing the NA estimator, obtained directly from the data, to an expected estimator of the cumulative hazard rate, based on the assumed model under the null hypothesis$(H_0)$.
+\item Rather than a direct comparison of these two rates, we examine tests at weighted differences between the observed and expected hazard rates. The weights will allow us to put more emphasis on certain parts of the curves.
+\end{itemize}
+\end{frame}
+
+\section{One-Sample Tests}
+\begin{frame}{Introduction}
+\begin{itemize}
+\item Suppose that we have a censored sample of size $n$ from some population, test the hypothesis that the population hazard rate is $h_0(t)$ for all $t \le \tau$, against the alternative that not $h_0(t)$. 
+\item An estimate of the cumulative hazard rate function $H(t)$ is the NA estimator, given by $\sum_{t_i \le t}^{}\frac{d_i}{Y(t_i)}$, where $d_i$ is the number of events at the observed event times,$t_1,\cdots,t_D$ and $Y(t_i)$ is the number of individuals under study just prior to the observed event time $t_i$, and hence get the crude estimate of the $h_0(t_i)$.
+\item Compare the sum of weighted differences between the observed and expected hazard rates to test the $H_0$
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Test statistic}
+\begin{itemize}
+\item Let $W(t)$ be a weight function with the property that $W(t)$ is zero whenever $Y(t)$ is zero. The test statistic is:
+\begin{equation*}
+Z(\tau) = O(\tau) - E(\tau) = \sum_{i=1}^{D} W(t_i) \frac{d_i}{Y(t_i)} - \int_{0}^{\tau} W(s)h_0(s)ds
+\end{equation*}
+\item If $H_0$ is true, the variance is: 
+\begin{equation*}
+V[Z(\tau)] = \int_{0}^{\tau}W^2(s)\frac{h_0(s)}{Y(s)}ds
+\end{equation*}
+\item For large samples, the statistic $Z(\tau)^2/V[Z(\tau)]$ has a central chi-squared distribution when the $H_0$ is true.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Choose weight function}
+\begin{itemize}
+\item The most popular choice of a weight function is the weight $W(t)=Y(t)$ which yields the one-sample log-rank test.
+\item For left truncation, let $T_j$ be the time on study and $L_j$ be the delayed entry time for the $j$th patient. When $\tau$ is equal to the largest time on study:
+\begin{equation*}
+O(\tau) = observed \ number \ of \ events \ at \ or \ prior \  to \ time \ \tau
+\end{equation*}
+And 
+\begin{equation*}
+E(\tau) = V[Z(\tau)] = \sum_{j=1}^{n} [H_0(T_j) - H_0(L_j)]
+\end{equation*}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Harrington and Fleming function}
+\begin{itemize}
+\item Other weight functions like Harrington and Fleming function $W_{HF} = Y(t)S_0(t)^p[1-S_0(t)]^q, p\ge 0, q\ge 0$. 
+\item By choice of $p$ and $q$, one can put more weight on early departures from the $H_0$($p$ much larger than $q$).
+\item The log-rank weight is a special case of this model with $p=q=0$.
+\end{itemize}
+\end{frame}
+
+
+\section{Tests for Two or More Samples}
+\begin{frame}{Introduction}
+\begin{itemize}
+\item Now we can extend these methods to the problem of comparing hazard rates of $K(K\ge 2)$ populations, that is, test the following set of hypothesis: $H_0 : h_1(t) = h_2(t) = \cdots = h_K(t), \ for \ all \ t \le \tau$ vs $H_A\ : \ at\ least\ one\ of\ them\ is\ different$.Here $\tau$ is the largest time at which all of the groups have at least one subject at risk.
+\item Let $t_1<t_2<\cdots<t_D$ be the distinct death times in the pooled sample, at time $t_i$ we observed $d_{ij}$ events in the $j$th sample out of $Y_{ij}$ individuals at risk, $j=1,2,\cdots,k$, $i=1,2,\cdots,D$. Let $d_i = \sum_{j=1}^{K}d_{ij}$ and $Y_i = \sum_{j=1}^{K}Y_{ij}$ be the number of deaths and at risk in the combined sample at time $t_i$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Test statistic}
+\begin{itemize}
+\item The test of $H_0$ based on weighted comparisons of the estimated hazard rate of the $j$th population under $H_0$ and $H_A$, based on the NA estimator.
+\item Let $W_j(t)$ be a positive weight function with the property that $W_j(t_i) = 0$ whenever $Y_{ij} = 0$.
+\item For $H_0$, the test statistics:
+\begin{equation*}
+Z_j(\tau)  = \sum_{i=1}^{D} W_j(t)\big\lbrace \frac{d_{ij}}{Y_{ij}} - \frac{d_i}{Y_i}\big\rbrace. \ j = 1,\cdots,K
+\end{equation*}
+\item If all the $Z_j(\tau)$'s are close to zero then there is little evidence to believe that $H_0$ is false, otherwise... 
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Test statistic}
+\begin{itemize}
+\item All of commonly used tests have a weight function $W_j(t_i) = Y_{ij}W(t_i)$, $W(t_i)$ is a common weight shared by each group, and $Y_{ij}$ is the number at risk in the $j$th group at time $t_i$, so now:
+\begin{equation*}
+Z_j(\tau) = \sum_{i=1}^{D}W(t_i)[d_{ij} - Y_{ij}(\frac{d_i}{Y_i})] \ j = 1,\cdots,K
+\end{equation*}
+\item This class of weights the test statistic is the sum of the weighted difference between the observed number of deaths and the expected number of death under $H_0$ in the $j$th sample.
+\item The variance of $Z_j(\tau)$ is given by:
+\begin{equation*}
+\hat{\delta}_{ij} = \sum_{i=1}^{D} W(t_i)^2 \frac{Y_{ij}}{Y_i}(\frac{Y_i - d_i}{Y_{i}-1})d_i.  \ j =1,\cdots,K 
+\end{equation*}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Test statistic}
+\begin{itemize}
+\item and the covariance of $Z_j(\tau)$ and $Z_g(\tau)$ is:
+\begin{equation*}
+\hat{\delta}_{jg} = -\sum_{i=1}^{D} W(t_i)^2 \frac{Y_{ij}}{Y_i}\frac{Y_{jg}}{Y_i}(\frac{Y_i - d_i}{Y_{i}-1})d_i.  \ g\neq j
+\end{equation*}
+\item The test statistic is given by the quadratic form:
+\begin{equation*}
+\chi ^2 = (Z_1(\tau),\cdots,Z_{K-1}(\tau))\sum^{-1}(Z_1(\tau),\cdots,Z_{K-1}(\tau))'
+\end{equation*}
+\item When $H_0$ is true, it has the $\chi^2_{K-1}$, when $K=2$, the test statistic can be written as a $N(0,1)$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Choose weight function}
+\begin{itemize}
+\item Common choice of weight function $W(t)=1$ for all $t$, that's so called log-rank test
+\item A second choice of weights is $W(t_i) = Y_i$, it yields Gehan's generlization of the two-sample Mann-Whitney- Wilcoxon test and Breslow's generalization of the Kruskal-Wallis test.
+\item An alternate censored-data version of the Mann-Whitney-Wilcoxon test was proposed by Peto and Peto, and Kalbfleisch and Prentice, which define an estimate of the common survival function by
+\begin{equation*}
+\tilde{S}(t) = \prod_{t_i \le t}^{}(1-\frac{d_i}{Y_i + 1})
+\end{equation*}
+which is close to the pooled KM estimator, suggest using $W(t_i)=\tilde{S}(t_i)$.
+\end{itemize}
+\end{frame}
+
+\section{Tests for Trend}
+\begin{frame}{Determine the bandwidth}
+\begin{itemize}
+\item Now we test the trend for $K$ population hazard rates, the $H_0$ is still the same as before, but the $H_A$ is expressed:
+\begin{equation*}
+H_A: \ h_1(t) \le h_2(t) \le \cdots h_K(t) \ for \ t\le \tau, with \ at\ least\ one\ strict\ inequality
+\end{equation*}
+\item The test will be based on the statistics $Z_j(\tau)$ given by last section, and the weight functions discussed before can be used here.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Test statistic}
+\begin{itemize}
+\item To construct the test, a sequence of scores $a_1<a_2<\cdots<a_K$ is selected, any increasing set of scores can be used, and the test is invariant under linear transformations of the scores.
+\item In most cases, the scores $a_j = j$ are used, and the test statistic is:
+\begin{equation*}
+Z =  \frac{\sum_{j=1}^{K} a_j Z_j(\tau)}{\sqrt{\sum_{j=1}^{K}\sum_{g=1}^Ka_j a_g \hat{\sigma}_{jg}}}
+\end{equation*}
+\item  When the $H_0$ is true and the sample sizes are sufficiently large, then, this statistic has a $N(0,1)$ distribution. 
+\end{itemize}
+\end{frame}
+
+\section{Stratified Tests and Renyi Type Tests}
+\begin{frame}{Stratified Tests}
+\begin{itemize}
+\item When some other covariates that affect the event rates in the $K$ populations, one approach is to imbed the problem of comparing the $K$ populations into a regression function, the other one is to base the test on a stratified version of one of the tests in two or more samples.
+\item Assume that over test is to be stratified on $M$ levels of a set of covariates.
+\begin{equation*}
+H_0: h_{1s}(t) = h_{2s}(t) = \cdots = h_{Ks}(t) \ for\ s=1,\cdots,M,\ t<\tau
+\end{equation*}
+\item Based only on the data from the $s$th strata, let $Z_{js}(\tau)$ be the statistic as before, and let $Z_{j.}(\tau) = \sum_{s=1}^{M}Z_{js}(\tau)$ and $\hat{\sigma}_{jg.} = \sum_{s=1}^{M}\sigma_{jgs.}$, the test statistic is:
+\begin{equation*}
+\frac{\sum_{s=1}^{M}{Z_{1s}(\tau)}}{\sqrt{\sum_{s=1}^{M}\hat{\sigma}_{11s}}} \ \sim \ N(0,1)
+\end{equation*}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Renyi Type tests}
+\begin{itemize}
+\item When these tests are applied to samples from populations where the hazard rates cross, these tests have little power because early differences in favor of one group are canceled out by late differences in favor of the other treatment.
+\item The test statistics to be used are called Renyi statistics.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Renyi Type tests}
+\begin{itemize}
+\item When the hazard rates cross, the absolute value of these sequential evaluations of the test statistic will have a maximum value at some time point prior to the largest death time.
+\item When this value is too large, then, the $H_0: h_1(t) = h_2(t), t<\tau$ is rejected in favor of $H_A: h_1(t)<h_2(t)$, for some t, and we have to construct multiple test statistics on the same set of data, a correction is made to the critical value of the test.
+\item Suppose that we have two independent samples of size $n_1$ and $n_2$,respectively. Let $n=n_1+n_2$, and $t_1<t_2<\cdots<t_D$ be the distinct death times, $d_{ij}$ and $Y_{ij}$ be the number of deaths and at risk in $t_i$ and sample $j$, where $i=1,\cdots,D$, $j=1,2$.Let $Y_i = Y_{i1} + Y_{i2}$, and $d_{i}=d_{i1}+d_{i2}$ be the total.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Renyi Type tests}
+\begin{itemize}
+\item Let $W(t)$ be the weight function, for example, for log-rank function, let $W(t)=1$ as before, and for the Gehan-Wilcoxon version, let $W(t_i)=Y_{i1}+Y_{i2}$, for each value of $t_i$,we compute,$Z(t_i)$ as:
+\begin{equation*}
+Z(t_i) = \sum_{t_k \le t_i}^{}W(t_k)[d_{k1}-Y_{k1}{\frac{d_k}{Y_k}}], \ i = 1,\cdots,D
+\end{equation*}	
+\item Let $\sigma(\tau)$ be the standard error of $Z(\tau)$ which from tests for two or more samples that section
+\begin{equation*}
+\sigma^2(\tau)=\sum_{t_k \le \tau}^{}{W(t_k)}^2\bigg(\frac{Y_{k1}}{Y_k}\bigg)\bigg(\frac{Y_{k2}}{Y_k}\bigg)\bigg(\frac{Y_k - d_k}{Y_k -1}\bigg)(d_k)
+\end{equation*}
+where $\tau$ is the largest $t_k$ with $Y_{k1}$, $Y_{k2}>0$	
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Renyi Type tests}
+\begin{itemize}
+\item The test statistic for a two-sided alternative is given by:
+\begin{equation*}
+Q = sup \lbrace |Z(t)|,\ t \le \tau \rbrace /\sigma(\tau)
+\end{equation*}	
+\item When the $H_0$ is true, then, the distribution of $Q$ can be approximated by the distribution of the $sup(|B(x)|), \ 0\le x\le 1$, where $B$ is a standard Brownian motion process.
+\end{itemize}
+\end{frame}
+
+\section{Other Two-Sample Tests}
+\begin{frame}{Introduction}
+\begin{itemize}
+\item In this section, we present three other two-sample tests which constructed to have greater power than the tests to detect crossing hazard rates
+\item And here just introduce the first one, a censored-data version of the Cramer-von Mises test.
+\item For right-censored data, it is more appropriate to base a test on the integrated, squared difference between the two estimated hazard rates, and we present two versions of the test.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Cramer-von Mises test}
+\begin{itemize}
+\item Recall that the NA estimator of the cumulative hazard function in the $j$th sample is given by:
+\begin{equation*}
+\tilde{H}_j(t) = \sum_{t_i \le t}^{}\frac{d_{ij}}{Y_{ij}}, \ j =1,2.
+\end{equation*}
+and the variance is given by:
+\begin{equation*}
+{\sigma^2}_j(t)= \sum_{t_j \le t}^{}\frac{d_{ij}}{Y_{ij}(Y_{ij}-1)}, \ j =1,2.
+\end{equation*}
+\item This test is based on the difference between $\tilde{H}_1(t)$ and $\tilde{H}_2(t)$, so that we need to compute ${\sigma^2}(t)={\sigma^2}_1(t)+{\sigma^2}_2(t)$, which is estimated variance of $\tilde{H}_1(t)-\tilde{H}_2(t)$. 
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Cramer-von Mises test}
+\begin{itemize}
+\item Let $A(t) = n\sigma^2(t)/[1+n\sigma^2(t)]$, the first version of the Cramer-von Mises statistic is given by
+\begin{equation*}
+Q_1 = \bigg(\frac{1}{\sigma^2(\tau)}\bigg) \int_{0}^{\tau}[\tilde{H}_1(t_i) - \tilde{H}_2(t)]^2 [\sigma^2(t_i) - \sigma^2(t_{i-1})] 
+\end{equation*}
+where $t_0=0$, and the sum is over the distinct death times less than $\tau$.
+\item When the $H_0$ is true, the large sample
+distribution of $Q_1$ is the same as that of $R_1 = \int_{0}^{1}[B(x)]^2dx$, where $B(x)$ is a standard Brownian motion process.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Cramer-von Mises test}
+\begin{itemize}
+	\item An alternate version of the Cramer-von Mises statistic is given by:
+	\begin{equation*}
+	Q_2 = n \int_{0}^{\tau} \frac{[\tilde{H}_1(t)-\tilde{H}_2(t)]^2}{1+n\sigma^2(t)}dA(t) 
+	\end{equation*}
+	which is computed as
+	\begin{equation*}
+	Q_2 = n\sum_{t_i \le \tau}^{}\frac{[\tilde{H}_1(t_i) - \tilde{H}_2(t_i)]^2}{1+n\sigma^2(t_i)}[A(t_i) - A(t_{i-1})] 
+	\end{equation*}
+	\item When the $H_0$ is true, the large sample
+	distribution of $Q_1$ is the same as that of $R_2 = \int_{0}^{A(\tau)}[B^0(x)]^2dx$, where $B^0(x)$ is a standard Brownian motion process.
+	
+\end{itemize}
+\end{frame}
+\end{document}

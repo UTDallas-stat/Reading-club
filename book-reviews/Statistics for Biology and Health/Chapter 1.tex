@@ -1,0 +1,397 @@
+\documentclass{beamer}
+
+% Some common packages
+\usepackage{graphicx, color}
+\usepackage{alltt}
+\usepackage{booktabs, calc, rotating}
+\usepackage{natbib}
+\usepackage{multicol}
+\usepackage{amsmath, amsbsy, amssymb, amsthm, graphicx}
+\usepackage[english]{babel}
+\usepackage{xkeyval} 
+\usepackage{xfrac}
+\usepackage[normalem]{ulem}
+\usepackage{fancyvrb} 
+\usepackage{tikz, geometry, tkz-graph, xcolor}
+\usepackage[latin1]{inputenc}
+\usepackage{times}
+\usepackage[T1]{fontenc}
+
+% Some shortcuts
+\newcommand{\cov}{\mathrm{cov}}
+\newcommand{\dif}{\mathrm{d}}
+\newcommand{\bigbrk}{\vspace*{2in}}
+\newcommand{\smallbrk}{\vspace*{.1in}}
+\newcommand{\midbrk}{\vspace*{1in}}
+\newcommand{\red}[1]{{\color{red}#1}}
+\newcommand{\blue}[1]{{\color{blue}#1}}
+\newcommand{\green}[1]{{\color{green}#1}}
+\newcommand{\calc}[1]{{\fbox{\mbox{#1}}}}
+\newcommand{\Var}{\mathrm{Var}}%
+\newcommand{\Cov}{\mathrm{Cov}}%
+
+\usetheme[numbering=fraction, progressbar = frametitle]{metropolis}
+% section page?
+% \usetheme[sectionpage=none]{metropolis}
+% place progressbar under frametitle?
+% \usetheme[progressbar = frametitle]{metropolis}
+
+
+
+% To center title?
+\setbeamertemplate{title page}[default]
+% To add a rectangle box for title?
+% \setbeamercolor{titlelike}{parent = frametitle}   
+
+% item color and shape
+% \setbeamertemplate{itemize item}{\color{mDarkTeal}$\bullet$}
+% \setbeamertemplate{itemize subitem}{\color{mDarkTeal}$\bullet$}
+% \setbeamertemplate{itemize subsubitem}{\color{mDarkTeal}$\bullet$}
+
+% UTD colors
+\definecolor{warmgray10}{RGB}{118,106,98}
+\definecolor{warmgray2}{RGB}{213,210,202}
+\definecolor{warmgray1}{RGB}{230,230,230}
+\definecolor{flameOrange}{RGB}{199,91,18}
+\definecolor{ecoGreen}{RGB}{0,133,86}
+
+% only change item color 
+\setbeamercolor*{itemize item}{fg = mDarkTeal}
+\setbeamercolor*{itemize subitem}{fg = mDarkTeal}
+\setbeamercolor*{itemize subsubitem}{fg = mDarkTeal}
+% enumerate color
+\setbeamercolor*{enumerate item}{fg = mDarkTeal}
+\setbeamercolor*{enumerate subitem}{fg = mDarkTeal}
+\setbeamercolor*{enumerate subsubitem}{fg = mDarkTeal}
+% description color
+\setbeamercolor*{description item}{fg = mDarkTeal}
+\setbeamercolor*{description subitem}{fg = mDarkTeal}
+\setbeamercolor*{description subsubitem}{fg = mDarkTeal}
+
+% define blocks
+\newenvironment<>{problock}[1]{
+  \begin{actionenv}#2
+    \def\insertblocktitle{#1}
+    \par
+    \mode<presentation>{
+      \setbeamercolor{block title}{fg = white, bg = ecoGreen} %mDarkTeal}
+      \setbeamercolor{block body}{fg = black, bg = warmgray1}
+    }
+    \usebeamertemplate{block begin}}
+  {\par\usebeamertemplate{block end}\end{actionenv}}
+
+\newenvironment<>{defblock}[1]{
+  \begin{actionenv}#2
+    \def\insertblocktitle{#1}
+    \par
+    \mode<presentation>{
+      \setbeamercolor{block title}{fg = white,bg = flameOrange} %mDarkBrown}
+      \setbeamercolor{block body}{fg = black,bg = warmgray1}
+    }
+    \usebeamertemplate{block begin}}
+  {\par\usebeamertemplate{block end}\end{actionenv}}
+
+% \setbeamerfont{block title}{size={}}
+% \setbeamercolor{titlelike}{parent=structure,bg=flameOrange!80!black,fg=white} % title
+\mode
+<all>
+
+% fancy for Verbatim?
+\fvset{frame = single, framesep = 1mm,fontfamily = courier,
+  fontsize = \scriptsize, numbers = left, framerule = .3mm,
+  numbersep = 1mm,commandchars = \\\{\}}
+
+% reset text width
+\setbeamersize{text margin left = 5pt,text margin right = 5pt}
+
+\title[Short title]{Statistics for Biology and Health\\ Chapter 1 Basic Quantities and Models \\ 
+}
+\author[Author name]{Qi Guo}
+% \institute[UTD]{Department of Mathematical Sciences \\ The University of Texas at Dallas}
+\date{July 18,2019}
+% UTD logo on title page
+% \titlegraphic{\includegraphics[width=5cm]{mono_nsm_print_header.jpg}}
+\titlegraphic{\includegraphics[scale = .27]{UTDmono_NSM_header_RGB-1.png}}
+
+\begin{document}
+
+% default title thicker line
+% need to adjust
+% \frame{
+% \maketitle
+% \begin{tikzpicture}[remember picture, overlay]
+%   \def\xmargin{.1cm}     % Left and right margin of the title line
+%   \def\yshift{-0.1cm}   % Moves the title line upwards (-1.25cm moves title line downwards)
+%   \draw[mLightBrown,line width=2pt] (current page.west) ++(\xmargin,\yshift) -- ++({\paperwidth-2*\xmargin},0);
+% \end{tikzpicture}
+% }
+
+\frame{
+  \vspace{1cm}
+  \maketitle
+  \begin{tikzpicture}[remember picture, overlay]
+    \def\xmargin{.8cm}     % Left and right margin of the title line
+    \def\yshift{0.6cm}   % Moves the title line upwards 
+    \draw[mLightBrown,line width=2.2pt] (current page.west) ++(\xmargin,\yshift) -- ++({\paperwidth-2*\xmargin},0);
+  \end{tikzpicture}
+}
+
+
+% Set up UTD backgroud
+% Show background from here on
+\setbeamercolor*{item}{fg=red}
+\bgroup
+\usebackgroundtemplate{
+  \tikz[overlay,remember picture] \node[opacity=0.05, at=(current page.center)] {
+    \includegraphics[height=\paperheight,width=\paperwidth]{UTDbg}};}
+
+
+\begin{frame}{Contents}
+  \setbeamertemplate{section in toc}[sections numbered]
+  \tableofcontents[hideallsubsections]
+\end{frame}
+
+\section{Introduction}
+\begin{frame}{Survival data}
+\begin{itemize}
+\item A common feature of survival data sets is they contain either censored or truncated observations.
+\item Censored data arises when an individual's life length is known to occur only in a certain period of time.
+\begin{enumerate}
+\item Right censoring is known that the individual is still alive at a given time.
+\item Left censoring when all that is known is that the individual has experienced the event of interest prior to the start of the study.
+\item Interval censoring where the only information is that the event occurs within some intervals.
+\end{enumerate}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Survival data}
+\begin{itemize}
+\item Left truncation occurs when the subjects have been at risk before entering the study (for example: life insurance policy holders where the study starts on
+a fixed date, event of interest is age at death).
+\item Right truncation occurs when the entire study population has already experienced the event of interest (for example: a historical survey of patients on a cancer registry).
+\item Generally we deal with right censoring $\&$ sometimes left truncation.
+\end{itemize}
+\end{frame}
+
+\section{Basic Quantities}
+\begin{frame}{Functions}
+\begin{itemize}
+\item Let $X$ be the time until some specified event, and it's a non-negative random variable from a homogeneous population. 
+\begin{enumerate}
+\item The survival function: The probability of an individual surviving to time $x$. 
+\item The hazard rate function: The chance an individual of age $x$ experiences the event in the next instant in time.
+\item The probability density function: The unconditional probability of the event's occurring at time $x$. 
+\item The mean residual life: The mean time to the event of the interest, given the event has not occurred at $x$.
+\end{enumerate}
+\item If we know any one of these four functions, then the other three can be uniquely determined.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{The survival function}
+\begin{itemize}
+\item The probability of an individual surviving beyond time x (experiencing the event after time x)
+\begin{equation*}
+S(x) = Pr(X>x) = 1-F(x) = \int_{x}^{\infty}f(t)dt
+\end{equation*}
+\item For a discrete random variable $X$.
+\begin{equation*}
+S(x) = Pr(X>x) = \sum_{x_j > x}^{}P(x_j)
+\end{equation*}
+\item For the Weibull distribution, $S(x) = exp(-\lambda x^{\alpha}),  \lambda>0,\alpha>0$, when $\alpha = 1$ is the exponential distribution.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{The hazard function}
+\begin{itemize}
+\item The hazard rate is defined by:
+\begin{equation*}
+h(x) = \lim_{\Delta x \to 0} \frac{P(x \le X < x+\Delta x | X \ge x)}{\Delta x}
+\end{equation*}
+\item If $X$ is a continuous random variable, $h(x)= \frac{f(x)}{S(x)} = -\frac{d \ln(S(x))}{dx}$
+\begin{equation*}
+H(x) = \int_{0}^{x} h(\mu) d\mu = -ln[S(x)] 
+\end{equation*}
+\begin{equation*}
+S(x) = exp[-H(x)] = exp[-\int_{0}^{x}h(\mu)d\mu]
+\end{equation*}
+\item For the Weibull distribution, $\alpha > 1$, $h(x)$ increasing, $\alpha < 1$, $h(x)$ decreasing.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{The hazard function}
+\begin{itemize}
+\item If $X$ is a discrete random variable,
+\begin{equation*}
+h(x_j) = Pr(X = x_j | X \ge x_j) = \frac{P(x_j)}{S(x_{j-1})}, j=1,2,...
+\end{equation*}
+where $S(x_0)=1$. $P(x_j) = S(x_{j-1}) - S(x_j)$ and $h(x_j) = 1-S(x_j)/S(x_{j-1}), j=1,2,...$
+\item So the survival function is:
+\begin{equation*}
+S(x) = \prod_{x_j \le x}^{} S(x_j)/S(x_{j-1}) = \prod_{x_j \le x}^{}[1-h(x_j)]
+\end{equation*}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{The mean residual life function and median life}
+\begin{itemize}
+\item The mean residual life function measures their expected remaining lifetime(area under survival curve to the right of $x$ divided by $S(x)$)
+\begin{equation*}
+mrl(x) = E(X-x|X>x)
+\end{equation*}
+$\mu=mrl(0)$ is the mean life, total area under the survival curve.
+\item For a continuous random variable,
+\begin{equation*}
+mrl(x) = \frac{\int_{x}^{\infty}(t-x)f(t)dt}{S(x)} = \frac{\int_{x}^{\infty}S(t)dt}{S(x)}
+\end{equation*}
+\begin{equation*}
+\mu = E(x) = \int_{0}^{\infty}tf(t)dt = \int_{0}^{\infty}S(t)dt
+\end{equation*}
+\item The median lifetime for a continuous random variable $x$ is the $x_{0.5}$, so that $S(x_{0.5}) = 0.5$
+\end{itemize}
+\end{frame}
+
+\section{Regression Models for Survival Data}
+\begin{frame}{Models}
+ \begin{itemize}
+ \item Consider a failure time $X>0$, a vector $Z' = (Z_1,\cdots,Z_p)$ of explanatory variables associated with failure time $x$, $Z'$ may include quantitative variables (such as blood pressure, temperature, age, and weight), qualitative variables (such as gender, race, treatment, and disease status) and/or time-dependent variables,$Z'(x) = [Z_1(x), \cdots, Z_p(x)]$.
+ \item Two approaches to the modeling of covariate effects on survival.
+ \end{itemize}
+\end{frame}
+
+\begin{frame}{Models}
+\begin{itemize}
+\item 1. The first approach is analogous to the classical linear regression approach, $Y=\ln(X)$. A linear model is assumed for $Y$, namely,
+\begin{equation*}
+Y = \mu + \gamma' z +\delta w
+\end{equation*}
+where $\gamma' = (\gamma_1, \cdots, \gamma_p)$ is a vector of regression coefficients and $w$ is the error distribution.\linebreak
+If $W \thicksim N(0,1)$, $Y \thicksim \log$ normal regression model.\linebreak
+If $W\thicksim exp(w-e^{w}), -\infty < w < \infty$, $Y \thicksim$ Weibull regression model.\linebreak
+This model is called the accelerated failure-time(AFT) model.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{The accelerated failure time model}
+\begin{itemize}
+\item Let $S_0(x)$ denote the survival function of $X=e^{Y}$ when $Z$ is 0, that is $S_0(x)$ is the survival function of $\exp(\mu +\delta w)$, and
+\begin{equation*}
+Pr(X>x|z) = S_0[x \exp(-\gamma' z)]	
+\end{equation*}
+\item So the hazard rate of an individual with a covariate value $Z$ for the model is related to a baseline hazard rate $h_0$ by
+\begin{equation*}
+h(x|z) = h_0[x\exp(-\gamma'z)]\exp(-\gamma'z)
+\end{equation*}
+\item Although the accelerated failure-time model provides a direct extension of the classical linear model's construction for explanatory variables for conventional data, for survival data, its use is restricted by the error distributions one can assume.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Conditional hazard model}
+\begin{itemize}
+\item 2. The major approach to modeling the effects of covariates on survival is to model the conditional hazard rate as a function of the covariates.
+\item Two general classes of models have been used to relate covariate effects to survival, the family of multiplicative hazard models and the family of additive hazard rate models.
+\item For the family of multiplicative hazard rate models the conditional hazard rate of an individual with covariate vector $z$ is a product of a baseline hazard rate $h_0(x)$ and a non-negative function of the covariates, $c(\beta',z)$
+\begin{equation*}
+h(x|z) = h_0(x)c(\beta' z)
+\end{equation*}
+$h_0(x)$ may have a specified parametric form or it may be left as an arbitrary non-negative function. 
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Multiplicative hazards models}
+\begin{itemize}
+\item Most applications use the Cox model with $c(\beta' z)=exp(\beta' z)$,which is chosen for its simplicity and for the fact it is positive for any value of $\beta' z$.
+\item A key feature of multiplicative hazards models is that, when all the covariates are fixed at time 0, the hazard rates of two individuals with distinct values of $z$ are proportional. 
+\begin{equation*}
+\frac{h(x|z_1)}{h(x|z_2)}= \frac{h_0(x)c(\beta'z_1)}{h_0(x)c(\beta'z_2)}=\frac{c(\beta'z_1)}{c(\beta'z_2)}
+\end{equation*}
+which is a constant independent of time.
+\item So it can expressed in terms of a baseline survival function $S_0(x)$ as 
+\begin{equation*}
+S(x|z) = S_0(x)^{c(\beta'z)}
+\end{equation*}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Additive hazard rate models}
+\begin{itemize}
+\item The conditional hazard function is:
+\begin{equation*}
+h(x|z)=h_0(x)+\sum_{j=1}^{p}z_j(x)\beta_j(x)  
+\end{equation*}
+\item Estimation for additive models is typically made by non-parametric (weighted) least-squares methods. 
+\end{itemize}
+\end{frame}
+
+\section{Models for Competing Risks}
+\begin{frame}{Competing Risks}
+\begin{itemize}
+\item When each subject may fail due to one of $K(K
+\ge 2)$ causes, called competing risks.
+\item  Occurrence of one of these events precludes us from observing the other event on this patient. 
+\item Another classical example of competing risks is cause-specific mortality, such as death from heart disease, death from cancer, death from other causes, etc.
+\item Let $X_i$, $i=1, \cdots,K$ be the potential unobserv- able time to occurrence of the $i$th competing risk. What we observe for each patient is the time at which the subject fails from any cause, $T= min(X_1,\cdots,X_p)$ and an indicator $\delta$ which tells which of the $K$ risks caused the patient to fail, that is,$\delta = i$ if $T = X_i$
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Competing Risks}
+\begin{itemize}
+\item The basic competing risks parameter is the cause-specific hazard rate for risk $i$ defined by:
+\begin{equation*}\label{eq1}
+\begin{split}
+h_i(t) &= \lim_{\Delta t \to 0} \frac{P[t \le T < t+\Delta t, \delta =i | T \ge t]}{\Delta t} \\
+&=  \lim_{\Delta t \to 0} \frac{P[t \le T < t+\Delta t, \delta =i | x_j \ge t, j=1,2,\cdots,k]}{\Delta t} 
+\end{split}
+\end{equation*}
+$h_i(t)$ tells us the rate at which subjects who have yet to experience any of the competing risks are experiencing the $i$th competing cause of failure. 
+\item  The overall hazard rate of the time to failure, $T$,is the sum of these $K$ cause-specific hazard rates; that is
+\begin{equation*}
+h_T(t) = \sum_{i=1}^{K}h_i(t)
+\end{equation*}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Competing Risks}
+\begin{itemize}
+\item The cause-specific hazard rate can be derived from the joint survival function of the $K$ competing risks. Let $S(t_1,\cdots,t_K) = \linebreak Pr[x_1>t_1,\cdots,x_K>t_K]$.
+\begin{equation*}
+h_i(t) = \frac{-\partial S(t_1,\cdots,t_K)/\partial t_i |_{t_1 = \cdots = t_K =t} }{S(t,\cdots,t)}
+\end{equation*}
+\item In competing risks problems we are often interested not in the hazard rate but rather in some probability which summarizes our knowledge about the likelihood of the occurrence of a particular competing risk.Three probabilities are computed,crude, net, and partial crude probabilities.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Competing Risks}
+\begin{itemize}
+\item The crude probability is the probability of death from a particular cause in the real world where all other risks are acting on the individual(e.g: P(death from heart disease) $\longrightarrow$ P(die from heart disease prior to age 50))
+\item The net probability is the probability of death in a hypothetical world where the specific risk is the only risk acting on the population.(e.g: P(die from heart disease in the counterfactual world where men can only die from heart disease))
+\item The partial crude probabilities are the probability of death in a hypothetical world where some risks of death have been eliminated.(e.g: P(dies from heart disease in a world where cancer has been cured)).
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Competing Risks}
+\begin{itemize}
+\item The Crude probabilities are typically expressed by the cause-specific sub-distribution function, also known as the cumulative incidence function, is defined as:
+\begin{equation*}
+F_i(t) = P[T\le t, \delta = i] = \int_{0}^{t}h_i(\mu)\exp\lbrace -H_T(\mu)\rbrace d\mu
+\end{equation*}
+Here $H_T(t) = \sum_{j=1}^{K}\int_{0}^{t}h_j(\mu)d\mu$ is the cumulative hazard rate of $T$.
+\item The net survival function, $S_i(t)$, is the marginal survival function found from the joint survival function by taking $t_j=0$ for all $j\neq i$. When the competing risks are independent then the net survival function is related to the crude probabilities by:
+\begin{equation*}
+S_T(t) \le S_i(t) \le 1-F_i(t)
+\end{equation*}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Competing Risks}
+\begin{itemize}
+\item For partial crude probabilities, let $J$ be the set of causes that an individual can fail from and $J^C$ the set of causes which are eliminated from consideration.
+\item Let $T^{J} = min (x_i, i \in J)$ then define the partial crude sub-distribution function by $F_{i}^{J}(t) = Pr[T^{J} \le t, \delta = i], i\in J$
+\item Define a partial crude hazard rate:
+\begin{equation*}
+\lambda_{i}^{J}(t) = \frac{-\partial S(t_1,\cdots,t_K)/\partial t_i |_{t_j =t, t_j \in J; t_j = 0, t_j \in J^{C}} }{S(t_1,\cdots,t_p)|_{t_j =t, t_j \in J; t_j = 0, t_j \in J^{C}}}
+\end{equation*}
+\end{itemize}
+\end{frame}
+\end{document}

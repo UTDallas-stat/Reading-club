@@ -1,0 +1,283 @@
+\documentclass{beamer}
+
+% Some common packages
+\usepackage{graphicx, color}
+\usepackage{alltt}
+\usepackage{booktabs, calc, rotating}
+\usepackage{natbib}
+\usepackage{multicol}
+\usepackage{amsmath, amsbsy, amssymb, amsthm, graphicx}
+\usepackage[english]{babel}
+\usepackage{xkeyval} 
+\usepackage{xfrac}
+\usepackage[normalem]{ulem}
+\usepackage{fancyvrb} 
+\usepackage{tikz, geometry, tkz-graph, xcolor}
+\usepackage[latin1]{inputenc}
+\usepackage{times}
+\usepackage[T1]{fontenc}
+
+% Some shortcuts
+\newcommand{\cov}{\mathrm{cov}}
+\newcommand{\dif}{\mathrm{d}}
+\newcommand{\bigbrk}{\vspace*{2in}}
+\newcommand{\smallbrk}{\vspace*{.1in}}
+\newcommand{\midbrk}{\vspace*{1in}}
+\newcommand{\red}[1]{{\color{red}#1}}
+\newcommand{\blue}[1]{{\color{blue}#1}}
+\newcommand{\green}[1]{{\color{green}#1}}
+\newcommand{\calc}[1]{{\fbox{\mbox{#1}}}}
+\newcommand{\Var}{\mathrm{Var}}%
+\newcommand{\Cov}{\mathrm{Cov}}%
+
+\usetheme[numbering=fraction, progressbar = frametitle]{metropolis}
+% section page?
+% \usetheme[sectionpage=none]{metropolis}
+% place progressbar under frametitle?
+% \usetheme[progressbar = frametitle]{metropolis}
+
+
+
+% To center title?
+\setbeamertemplate{title page}[default]
+% To add a rectangle box for title?
+% \setbeamercolor{titlelike}{parent = frametitle}   
+
+% item color and shape
+% \setbeamertemplate{itemize item}{\color{mDarkTeal}$\bullet$}
+% \setbeamertemplate{itemize subitem}{\color{mDarkTeal}$\bullet$}
+% \setbeamertemplate{itemize subsubitem}{\color{mDarkTeal}$\bullet$}
+
+% UTD colors
+\definecolor{warmgray10}{RGB}{118,106,98}
+\definecolor{warmgray2}{RGB}{213,210,202}
+\definecolor{warmgray1}{RGB}{230,230,230}
+\definecolor{flameOrange}{RGB}{199,91,18}
+\definecolor{ecoGreen}{RGB}{0,133,86}
+
+% only change item color 
+\setbeamercolor*{itemize item}{fg = mDarkTeal}
+\setbeamercolor*{itemize subitem}{fg = mDarkTeal}
+\setbeamercolor*{itemize subsubitem}{fg = mDarkTeal}
+% enumerate color
+\setbeamercolor*{enumerate item}{fg = mDarkTeal}
+\setbeamercolor*{enumerate subitem}{fg = mDarkTeal}
+\setbeamercolor*{enumerate subsubitem}{fg = mDarkTeal}
+% description color
+\setbeamercolor*{description item}{fg = mDarkTeal}
+\setbeamercolor*{description subitem}{fg = mDarkTeal}
+\setbeamercolor*{description subsubitem}{fg = mDarkTeal}
+
+% define blocks
+\newenvironment<>{problock}[1]{
+  \begin{actionenv}#2
+    \def\insertblocktitle{#1}
+    \par
+    \mode<presentation>{
+      \setbeamercolor{block title}{fg = white, bg = ecoGreen} %mDarkTeal}
+      \setbeamercolor{block body}{fg = black, bg = warmgray1}
+    }
+    \usebeamertemplate{block begin}}
+  {\par\usebeamertemplate{block end}\end{actionenv}}
+
+\newenvironment<>{defblock}[1]{
+  \begin{actionenv}#2
+    \def\insertblocktitle{#1}
+    \par
+    \mode<presentation>{
+      \setbeamercolor{block title}{fg = white,bg = flameOrange} %mDarkBrown}
+      \setbeamercolor{block body}{fg = black,bg = warmgray1}
+    }
+    \usebeamertemplate{block begin}}
+  {\par\usebeamertemplate{block end}\end{actionenv}}
+
+% \setbeamerfont{block title}{size={}}
+% \setbeamercolor{titlelike}{parent=structure,bg=flameOrange!80!black,fg=white} % title
+\mode
+<all>
+
+% fancy for Verbatim?
+\fvset{frame = single, framesep = 1mm,fontfamily = courier,
+  fontsize = \scriptsize, numbers = left, framerule = .3mm,
+  numbersep = 1mm,commandchars = \\\{\}}
+
+% reset text width
+\setbeamersize{text margin left = 5pt,text margin right = 5pt}
+
+\title[Short title]{Statistics for Biology and Health\\ Chapter 10 Regression Diagnostics\ 
+}
+\author[Author name]{Qi Guo}
+% \institute[UTD]{Department of Mathematical Sciences \\ The University of Texas at Dallas}
+\date{July 26,2019}
+% UTD logo on title page
+% \titlegraphic{\includegraphics[width=5cm]{mono_nsm_print_header.jpg}}
+\titlegraphic{\includegraphics[scale = .27]{UTDmono_NSM_header_RGB-1.png}}
+
+\begin{document}
+
+% default title thicker line
+% need to adjust
+% \frame{
+% \maketitle
+% \begin{tikzpicture}[remember picture, overlay]
+%   \def\xmargin{.1cm}     % Left and right margin of the title line
+%   \def\yshift{-0.1cm}   % Moves the title line upwards (-1.25cm moves title line downwards)
+%   \draw[mLightBrown,line width=2pt] (current page.west) ++(\xmargin,\yshift) -- ++({\paperwidth-2*\xmargin},0);
+% \end{tikzpicture}
+% }
+
+\frame{
+  \vspace{1cm}
+  \maketitle
+  \begin{tikzpicture}[remember picture, overlay]
+    \def\xmargin{.8cm}     % Left and right margin of the title line
+    \def\yshift{0.6cm}   % Moves the title line upwards 
+    \draw[mLightBrown,line width=2.2pt] (current page.west) ++(\xmargin,\yshift) -- ++({\paperwidth-2*\xmargin},0);
+  \end{tikzpicture}
+}
+
+
+% Set up UTD backgroud
+% Show background from here on
+\setbeamercolor*{item}{fg=red}
+\bgroup
+\usebackgroundtemplate{
+  \tikz[overlay,remember picture] \node[opacity=0.05, at=(current page.center)] {
+    \includegraphics[height=\paperheight,width=\paperwidth]{UTDbg}};}
+
+
+\begin{frame}{Contents}
+  \setbeamertemplate{section in toc}[sections numbered]
+  \tableofcontents[hideallsubsections]
+\end{frame}
+
+\section{Introduction}
+\begin{frame}{Introduction}
+\begin{itemize}
+\item  Commonly we are interested in examining four aspects of the proportional hazards model.
+\item First, for a given covariate, see the best functional form to explain the influence of the covariate on survival, adjusting for other covariates. For example, for a given covariate $Z$, is its influence on survival best modeled by
+ $h_0(t)\exp(\beta Z)$, by $h_0(t)\exp(\beta \log Z)$, or, by a binary covariate defined by 1 if $Z \ge Z_0$; 0 of $Z< Z_0$.
+\item The second aspect of the model to be checked is the adequacy of the proportional hazards assumption.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Introduction}
+\begin{itemize}
+\item The third aspect of the model to be checked is its accuracy for predicting the survival of a given subject.
+\item The final aspect of the model to be examined is the influence or leverage each subject has on the model fit. This will also give us some information on possible outliers.
+\item In the usual linear regression setup, it is quite easy to define a residual for the fitted regression model.
+\end{itemize}
+\end{frame}
+
+\section{Cox-Snell Residuals for Assessing the Fit of a Cox Model}
+\begin{frame}{Introduction}
+\begin{itemize}
+\item  The Cox and Snell residuals can be used to assess the fit of a model based on the Cox proportional hazards model.
+\item Suppose a Cox model was fitted to data $(T_j, \delta_j, Z_j), j = 1, \cdots, n$, assume that $Z_j = (Z_{j1}, \cdots, Z_{jp})'$ are all fixed-time covariates. Suppose that the proportional hazards model $h(t|Z_j) = h_0(t)\exp(\sum\beta_k Z_{jk})$ has been fitted to the model.
+\item If the estimates of the $\beta'$s from the postulated model are $b = (b_1,\cdots, b_p)'$, then, the Cox-Snell residuals are defined as:
+\begin{equation*}
+r_j = \hat{H}_0(T_j) \exp\big(\sum_{k=1}^{p}Z_{jk}b_k \big), j = 1,\cdots,n
+\end{equation*}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Introduction}
+\begin{itemize}
+\item Here, $\hat{H}_0(t)$ is Breslow's estimator of the baseline hazard rate defined in Chapter 7. If the model is correct and the $b'$s are close to the true values of $\beta$ then, the $r_j$'s should look like a censored sample from a unit exponential distribution.
+\item To check it, we compute the NA estimator of the cumulative hazard rate of $r_j$'s. If the unit exponential distribution fits the data, then, this estimator should be approximately equal to the cumulative hazard rate of the unit exponential $H_E(t)=t$. 
+\item Thus, a plot of the estimated cumulative hazard rate of the $r_j$'s,$\hat{H}_r(r_j)$, versus $r_j$ should be a straight line through the origin with a slope of 1. 	
+\end{itemize}
+\end{frame}
+
+
+\section{Determining the Functional Form of a Covariate: Martingale Residuals}
+\begin{frame}{Introduction}
+\begin{itemize}
+\item Now examine the problem of determining the functional form to be used for a given covariate to best explain its effect on survival through a Cox proportional hazards model, such as $\log Z$, $Z^2$, or $Z\log Z$, etc.
+\item The residual we shall use here, called a martingale residual, is a slight modification of the Cox-Snell residual.
+\item Suppose that for the $j$th individual in the sample, we have a vector $Z_j(t)$ of possible time-dependent covariates, Let $N_j(t)$ have a value of 1 at time $t$ if this individual has experienced the event of interest,$Y_j(t)$ is the indicator that individual $j$ is under study at a time just prior to time $t$, $b$ is the vector of regression coefficients and $\hat{H}_0(t)$ the Breslow estimator of the cumulative baseline hazard rate.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Martingale Residuals}
+\begin{itemize}
+\item The martingale residual is defined as; 
+\begin{equation*}
+\hat{M}_j = N_j(\infty) - \int_{0}^{\infty} Y_j(t) \exp[b' Z_j(t)]d\hat{H}_0(t),\ j =1, \cdots, n
+\end{equation*}
+\item When the data is right-censored and all the covariates are fixed at the start of the study, then the martingale residual reduces to 
+\begin{equation*}
+\hat{M}_j = \delta_j  - \hat{H}_0(T_j)\exp \big(\sum_{k=1}^{p}Z_{jk}b_k \big) = \delta_j - r_j,\  j=1,\cdots,n. 
+\end{equation*}
+\item The residuals have the property $\sum_{j=1}^{n}\hat{M_j} = 0$. 
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Martingale Residuals}
+\begin{itemize}
+\item Suppose that the covariate vector $Z$ is partitioned into a vector $Z^*$, for which we know the proper functional form of the Cox model, and a single covariate $Z_1$ for which we are unsure of what functional form of $Z_1$ to use. 
+\item Assume that $Z_1$ is independent of $Z^*$. Let $f(Z_1)$ be the best function of $Z_1$ to explain its effect on survival.Our optimal Cox model is, then:
+\begin{equation*}
+H(t|Z^*, Z_1) = H_0(t)\exp(\beta^* Z^*) \exp[f(Z_1)]
+\end{equation*}
+\item To find $f$, we fit a Cox model to the data based on $Z^*$ and compute the martingale residuals, $\hat{M}_j, j =1,\cdots,n$. These residuals are plotted against the value of $Z_1$ for the $j$th observation. 
+\item  If the plot is linear, then, no transformation of $Z_1$ is needed. If there appears to be a threshold, then, a discretized version of the covariate is indicated.
+\end{itemize}
+\end{frame}
+
+\section{Graphical Checks of the Proportional Hazards Assumption}
+\begin{frame}{Graphical Checks of the Proportional Hazards Assumption}
+\begin{itemize}
+\item If we check for proportional hazards for a given covariate $Z_1$ after adjusting for all other relevant covariates in the model, after we write the full covariate vector as $Z=(Z_1, Z'_2)'$ where $Z_2$ is the vector of the remaining $p-1$ covariates in the model. We assume that there is no term in the model for interaction between $Z_1$ and any of the remaining covariates.
+\item Here introduce two approaches. The first series of plots requires that the covariate $Z_1$ has only $K$ possible values. For a continuous covariate, we stratify the covariate into $K$ disjoint strata, $G_1,G_2, \cdots, G_K$,
+whereas, for a discrete covariate, we assume that $Z_1$ takes only the values $1,2,\cdots,K$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Graphical Checks of the Proportional Hazards Assumption}
+\begin{itemize}
+\item Fit a Cox model stratified on the discrete values of $Z_1$,and we let $\hat{H}_{g0}(t)$ be the estimated cumulative hazard rate in the $g$th stratum. If the proportional hazards model holds, then, the baseline cumulative hazard rates in each of the strata should be a constant multiple of each other.
+\item To check the proportionality assumption one could plot $\ln[\hat{H}_{10}(t)],\cdots,\ln[\hat{H}_{k0}(t)]$ vs $t$.  If the assumption holds, then, these should be approximately parallel and the constant vertical separation between $\ln[\hat{H}_{g0}(t)]$ and $\ln[\hat{H}_{h0}(t)]$ should give a crude estimate of the factor needed to obtain $\ln[\hat{H}_{h0}(t)]$ from $\ln[\hat{H}_{g0}(t)]$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Graphical Checks of the Proportional Hazards Assumption}
+\begin{itemize}
+\item An alternative approach is to plot $\ln[\hat{H}_{g0}(t)] - \ln[\hat{H}_{10}(t)]$ vs $t$ for $g=2,\cdots,K$. If the proportional hazards model holds, each curve should be roughly constant. This method has the advantage that we are seeking horizontal lines for each curve rather than comparing parallel curves. 
+\item And we still have another graphical method based on $\hat{H}_{g0}(t)$ is the so-called Andersen (1982) plots, more details in book P368-P377.
+\end{itemize}
+\end{frame}
+
+
+\section{Deviance Residuals}
+\begin{frame}{The Deviance Residuals}
+\begin{itemize}
+\item Now we examine a model for outliers, after a final proportional hazards model has been fit to the data.
+\item The martingale residual $\hat{M}_j$ is a candidate for the desired residual, which give a measure of the difference between the indicator of whether a given individual experiences the event of interest and the expected number of events the individual would have experienced.
+\item The deviance residual is used to obtain a residual which has a distribution more normally shaped than the martingale residual, which is defined by:
+\begin{equation*}
+D_j = sign[\hat{M}_j] \lbrace -2[\hat{M}_j + \delta_j \log(\delta_j - \hat{M}_j)] \rbrace ^{1/2}
+\end{equation*}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{The Deviance Residuals}
+\begin{itemize}
+\item We construct a plot of the deviance residuals $D_j$ vs the risk scores $\sum_{k=1}^{p}b_k Z_{jk}$.
+\item When there is light to moderate censoring, the $D_j$ should looks like a sample of normally distributed noise.
+\item When there is heavy censoring, a large collection of points near zero will distort the normal approximation, in either cases, potential outliers will have deviance residuals whose absolute values are too large.	
+\end{itemize}
+\end{frame}
+
+
+\section{Checking the Influence of Individual Observations}
+\begin{frame}{Introduction}
+\begin{itemize}
+\item The optimal means of checking the influence of a given observation on the estimation process is to compare the estimate $b$ one obtains by estimating $\beta$ from all the data to the estimate $b_{(j)}$ obtained from the data with the given observation deleted from the sample.
+\item If $b - b_{(j)}$ close to zero, $j$th observation has little influence.
+\item To compute $b - b_{(j)}$ directly requires fitting $n+1$ Cox regression models, one with the complete data and n with a single observation eliminated, but it's not feasible in larger problems.
+\item And we can use the codes in notes before.
+\end{itemize}
+\end{frame}
+\end{document}

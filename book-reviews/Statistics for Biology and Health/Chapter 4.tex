@@ -1,0 +1,218 @@
+\documentclass{beamer}
+
+% Some common packages
+\usepackage{graphicx, color}
+\usepackage{alltt}
+\usepackage{booktabs, calc, rotating}
+\usepackage{natbib}
+\usepackage{multicol}
+\usepackage{amsmath, amsbsy, amssymb, amsthm, graphicx}
+\usepackage[english]{babel}
+\usepackage{xkeyval} 
+\usepackage{xfrac}
+\usepackage[normalem]{ulem}
+\usepackage{fancyvrb} 
+\usepackage{tikz, geometry, tkz-graph, xcolor}
+\usepackage[latin1]{inputenc}
+\usepackage{times}
+\usepackage[T1]{fontenc}
+
+% Some shortcuts
+\newcommand{\cov}{\mathrm{cov}}
+\newcommand{\dif}{\mathrm{d}}
+\newcommand{\bigbrk}{\vspace*{2in}}
+\newcommand{\smallbrk}{\vspace*{.1in}}
+\newcommand{\midbrk}{\vspace*{1in}}
+\newcommand{\red}[1]{{\color{red}#1}}
+\newcommand{\blue}[1]{{\color{blue}#1}}
+\newcommand{\green}[1]{{\color{green}#1}}
+\newcommand{\calc}[1]{{\fbox{\mbox{#1}}}}
+\newcommand{\Var}{\mathrm{Var}}%
+\newcommand{\Cov}{\mathrm{Cov}}%
+
+\usetheme[numbering=fraction, progressbar = frametitle]{metropolis}
+% section page?
+% \usetheme[sectionpage=none]{metropolis}
+% place progressbar under frametitle?
+% \usetheme[progressbar = frametitle]{metropolis}
+
+
+
+% To center title?
+\setbeamertemplate{title page}[default]
+% To add a rectangle box for title?
+% \setbeamercolor{titlelike}{parent = frametitle}   
+
+% item color and shape
+% \setbeamertemplate{itemize item}{\color{mDarkTeal}$\bullet$}
+% \setbeamertemplate{itemize subitem}{\color{mDarkTeal}$\bullet$}
+% \setbeamertemplate{itemize subsubitem}{\color{mDarkTeal}$\bullet$}
+
+% UTD colors
+\definecolor{warmgray10}{RGB}{118,106,98}
+\definecolor{warmgray2}{RGB}{213,210,202}
+\definecolor{warmgray1}{RGB}{230,230,230}
+\definecolor{flameOrange}{RGB}{199,91,18}
+\definecolor{ecoGreen}{RGB}{0,133,86}
+
+% only change item color 
+\setbeamercolor*{itemize item}{fg = mDarkTeal}
+\setbeamercolor*{itemize subitem}{fg = mDarkTeal}
+\setbeamercolor*{itemize subsubitem}{fg = mDarkTeal}
+% enumerate color
+\setbeamercolor*{enumerate item}{fg = mDarkTeal}
+\setbeamercolor*{enumerate subitem}{fg = mDarkTeal}
+\setbeamercolor*{enumerate subsubitem}{fg = mDarkTeal}
+% description color
+\setbeamercolor*{description item}{fg = mDarkTeal}
+\setbeamercolor*{description subitem}{fg = mDarkTeal}
+\setbeamercolor*{description subsubitem}{fg = mDarkTeal}
+
+% define blocks
+\newenvironment<>{problock}[1]{
+  \begin{actionenv}#2
+    \def\insertblocktitle{#1}
+    \par
+    \mode<presentation>{
+      \setbeamercolor{block title}{fg = white, bg = ecoGreen} %mDarkTeal}
+      \setbeamercolor{block body}{fg = black, bg = warmgray1}
+    }
+    \usebeamertemplate{block begin}}
+  {\par\usebeamertemplate{block end}\end{actionenv}}
+
+\newenvironment<>{defblock}[1]{
+  \begin{actionenv}#2
+    \def\insertblocktitle{#1}
+    \par
+    \mode<presentation>{
+      \setbeamercolor{block title}{fg = white,bg = flameOrange} %mDarkBrown}
+      \setbeamercolor{block body}{fg = black,bg = warmgray1}
+    }
+    \usebeamertemplate{block begin}}
+  {\par\usebeamertemplate{block end}\end{actionenv}}
+
+% \setbeamerfont{block title}{size={}}
+% \setbeamercolor{titlelike}{parent=structure,bg=flameOrange!80!black,fg=white} % title
+\mode
+<all>
+
+% fancy for Verbatim?
+\fvset{frame = single, framesep = 1mm,fontfamily = courier,
+  fontsize = \scriptsize, numbers = left, framerule = .3mm,
+  numbersep = 1mm,commandchars = \\\{\}}
+
+% reset text width
+\setbeamersize{text margin left = 5pt,text margin right = 5pt}
+
+\title[Short title]{Statistics for Biology and Health\\ Chapter 4 Estimation of Basic Quantities for Other Sampling Schemes\\ 
+}
+\author[Author name]{Qi Guo}
+% \institute[UTD]{Department of Mathematical Sciences \\ The University of Texas at Dallas}
+\date{July 20,2019}
+% UTD logo on title page
+% \titlegraphic{\includegraphics[width=5cm]{mono_nsm_print_header.jpg}}
+\titlegraphic{\includegraphics[scale = .27]{UTDmono_NSM_header_RGB-1.png}}
+
+\begin{document}
+
+% default title thicker line
+% need to adjust
+% \frame{
+% \maketitle
+% \begin{tikzpicture}[remember picture, overlay]
+%   \def\xmargin{.1cm}     % Left and right margin of the title line
+%   \def\yshift{-0.1cm}   % Moves the title line upwards (-1.25cm moves title line downwards)
+%   \draw[mLightBrown,line width=2pt] (current page.west) ++(\xmargin,\yshift) -- ++({\paperwidth-2*\xmargin},0);
+% \end{tikzpicture}
+% }
+
+\frame{
+  \vspace{1cm}
+  \maketitle
+  \begin{tikzpicture}[remember picture, overlay]
+    \def\xmargin{.8cm}     % Left and right margin of the title line
+    \def\yshift{0.6cm}   % Moves the title line upwards 
+    \draw[mLightBrown,line width=2.2pt] (current page.west) ++(\xmargin,\yshift) -- ++({\paperwidth-2*\xmargin},0);
+  \end{tikzpicture}
+}
+
+
+% Set up UTD backgroud
+% Show background from here on
+\setbeamercolor*{item}{fg=red}
+\bgroup
+\usebackgroundtemplate{
+  \tikz[overlay,remember picture] \node[opacity=0.05, at=(current page.center)] {
+    \includegraphics[height=\paperheight,width=\paperwidth]{UTDbg}};}
+
+
+\begin{frame}{Contents}
+  \setbeamertemplate{section in toc}[sections numbered]
+  \tableofcontents[hideallsubsections]
+\end{frame}
+
+\section{Introduction}
+\begin{frame}{Introduction}
+\begin{itemize}
+\item Last Chapter we focus on estimate of the right-censored and left-truncated data, which is most common. 
+\item In this chapter, we examine about left censoring, censored individuals provide information indicating only that the event has occurred prior to entry into the study.
+\item Right-truncated data, which samples arise when one samples individuals from event records and, retrospectively determines the time to event.
+\item Estimation techniques for grouped data.  
+\end{itemize}
+\end{frame}
+
+\section{Estimation of the Survival Function for Left, Double, and Interval Censoring}
+\begin{frame}{Estimation of Left Censoring Data}
+\begin{itemize}
+\item Examples of pure left censoring are rare. More common are samples which include both left and right censoring.
+\item And in this case we use a modified KM estimator suggested by Turnbull, is based on an iterative procedure which extends the notion of a self-consistent estimator.
+\item To construct the estimator we assume that there is a grid of time points $0 = t_0 < t_1 < t_2 < \cdots < t_m$ at which subjects are observed. 
+\item Let $d_i$ be the number of deaths at time $t_i$, and $c_i$,$r_i$ are the number of individuals left-censored and right-censored at time $t_i$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Algorithm}
+\begin{itemize}
+\item The only information the left-censored observations at $t_i$ give us is that the event of interest has occurred at some $t_j \le t_i$
+\item  The self-consistent estimator estimates the probability that this event occurred at each possible $t_j$ less than $t_i$ based on an initial estimate of the survival function. 
+\item Using this estimate, we compute an expected number of deaths at $t_j$, which is then used to update the estimate of the survival function and the procedure is repeated until the estimated survival function stabilizes.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Algorithm}
+\begin{itemize}
+\item \texttt{Step 0}: Produce an initial estimate of the survival function at each $t_j$,$S_0(t_j)$. Note any legitimate estimate will work. Turnbull?s suggestion is to use the KM estimate obtained by ignoring the left-censored observations.
+\item \texttt{Step $(K+1)1$}: Using the current estimate of $S$, estimate $p_{ij} = p[t_{j-1} < x \le t_i | x\le t_i]$ by $\frac{S_K(t_{j-1}) - S_K(t_j)}{1-S_K(t_i)}$ for $j \le i $. 
+\item \texttt{Step $(K+1)2$}: Using the results of the previous step, estimate the number of events at time $t_i$ by $\hat{d}_i = d_i +\sum_{i=j}^{m}c_i p_{ij}$.
+\item \texttt{Step $(K+1)3$}: Compute the KM estimator based on the estimated right-censored data with $\hat{d}_i$ events and $r_i$ right-censored observations at $t_i$, ignoring the left-censored data. If this estimate, $S_{K+1}(t)$, is close to $S_K(t)$ for all $t_i$, stop the procedure; if not, go to step 1.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Estimation of the interval-censored data}
+\begin{itemize}
+\item Sometimes data may be interval-censored. Here the only information we have for each individual is that their event time falls in an interval $(L_i, R_i]$,$i=1,...,n$, but the exact time is unknown.
+\item And we still have a iteration like the estimarion of left-censored data in page 6.
+\end{itemize}
+\end{frame}
+
+\section{Estimation of the Survival Function for Right-Truncated Data}
+\begin{frame}{Right-Truncated Data}
+\begin{itemize}
+\item For right-truncated data, only individuals for which the event has occurred by a given date are included in the study. Right truncation arises commonly in the study of infectious diseases.
+\item Let $T_i$ denote the chronological time at which the $i$th individual is infected and $X_i$ the time between infection and the onset of disease.
+\item Sampling consists of observing $(T_i,X_i)$ for patients over the period $(0\ to\ \tau)$. Note that only patients who have the disease prior to $\tau$ are included in the study.
+\item Estimation for this type of data proceeds by reversing the time axis. Let $R_i = \tau - X_i$. The $R_i$'s are now left-truncated in that only individuals with value of $T_i \le R_i$ are included in the sample. 
+\end{itemize}
+\end{frame}
+
+\section{Estimation of Survival in the Cohort Life Table}
+\begin{frame}{Estimation of Survival in the Cohort Life Table}
+\begin{itemize}
+\item A``cohort'' is a group of individuals who have some common origin from which the event time will be calculated
+\item They are followed over time and their event time or censoring time is recorded to fall in one of $k+1$ adjacent, nonoverlapping intervals, $(a_{j-1}, a_j]$, $j=1,...,k+1$.
+\item A traditional cohort life table presents the actual mortality experience of the cohort from the birth of each individual to the death of the last surviving member of the cohort.
+\item The basic construction of the cohort life table is a little complicated, and more details in columns in P152.
+\end{itemize}
+\end{frame}
+\end{document}

@@ -1,0 +1,244 @@
+\documentclass{beamer}
+
+% Some common packages
+\usepackage{graphicx, color}
+\usepackage{alltt}
+\usepackage{booktabs, calc, rotating}
+\usepackage{natbib}
+\usepackage{multicol}
+\usepackage{amsmath, amsbsy, amssymb, amsthm, graphicx}
+\usepackage[english]{babel}
+\usepackage{xkeyval} 
+\usepackage{xfrac}
+\usepackage[normalem]{ulem}
+\usepackage{fancyvrb} 
+\usepackage{tikz, geometry, tkz-graph, xcolor}
+\usepackage[latin1]{inputenc}
+\usepackage{times}
+\usepackage[T1]{fontenc}
+
+% Some shortcuts
+\newcommand{\cov}{\mathrm{cov}}
+\newcommand{\dif}{\mathrm{d}}
+\newcommand{\bigbrk}{\vspace*{2in}}
+\newcommand{\smallbrk}{\vspace*{.1in}}
+\newcommand{\midbrk}{\vspace*{1in}}
+\newcommand{\red}[1]{{\color{red}#1}}
+\newcommand{\blue}[1]{{\color{blue}#1}}
+\newcommand{\green}[1]{{\color{green}#1}}
+\newcommand{\calc}[1]{{\fbox{\mbox{#1}}}}
+\newcommand{\Var}{\mathrm{Var}}%
+\newcommand{\Cov}{\mathrm{Cov}}%
+
+\usetheme[numbering=fraction, progressbar = frametitle]{metropolis}
+% section page?
+% \usetheme[sectionpage=none]{metropolis}
+% place progressbar under frametitle?
+% \usetheme[progressbar = frametitle]{metropolis}
+
+
+
+% To center title?
+\setbeamertemplate{title page}[default]
+% To add a rectangle box for title?
+% \setbeamercolor{titlelike}{parent = frametitle}   
+
+% item color and shape
+% \setbeamertemplate{itemize item}{\color{mDarkTeal}$\bullet$}
+% \setbeamertemplate{itemize subitem}{\color{mDarkTeal}$\bullet$}
+% \setbeamertemplate{itemize subsubitem}{\color{mDarkTeal}$\bullet$}
+
+% UTD colors
+\definecolor{warmgray10}{RGB}{118,106,98}
+\definecolor{warmgray2}{RGB}{213,210,202}
+\definecolor{warmgray1}{RGB}{230,230,230}
+\definecolor{flameOrange}{RGB}{199,91,18}
+\definecolor{ecoGreen}{RGB}{0,133,86}
+
+% only change item color 
+\setbeamercolor*{itemize item}{fg = mDarkTeal}
+\setbeamercolor*{itemize subitem}{fg = mDarkTeal}
+\setbeamercolor*{itemize subsubitem}{fg = mDarkTeal}
+% enumerate color
+\setbeamercolor*{enumerate item}{fg = mDarkTeal}
+\setbeamercolor*{enumerate subitem}{fg = mDarkTeal}
+\setbeamercolor*{enumerate subsubitem}{fg = mDarkTeal}
+% description color
+\setbeamercolor*{description item}{fg = mDarkTeal}
+\setbeamercolor*{description subitem}{fg = mDarkTeal}
+\setbeamercolor*{description subsubitem}{fg = mDarkTeal}
+
+% define blocks
+\newenvironment<>{problock}[1]{
+  \begin{actionenv}#2
+    \def\insertblocktitle{#1}
+    \par
+    \mode<presentation>{
+      \setbeamercolor{block title}{fg = white, bg = ecoGreen} %mDarkTeal}
+      \setbeamercolor{block body}{fg = black, bg = warmgray1}
+    }
+    \usebeamertemplate{block begin}}
+  {\par\usebeamertemplate{block end}\end{actionenv}}
+
+\newenvironment<>{defblock}[1]{
+  \begin{actionenv}#2
+    \def\insertblocktitle{#1}
+    \par
+    \mode<presentation>{
+      \setbeamercolor{block title}{fg = white,bg = flameOrange} %mDarkBrown}
+      \setbeamercolor{block body}{fg = black,bg = warmgray1}
+    }
+    \usebeamertemplate{block begin}}
+  {\par\usebeamertemplate{block end}\end{actionenv}}
+
+% \setbeamerfont{block title}{size={}}
+% \setbeamercolor{titlelike}{parent=structure,bg=flameOrange!80!black,fg=white} % title
+\mode
+<all>
+
+% fancy for Verbatim?
+\fvset{frame = single, framesep = 1mm,fontfamily = courier,
+  fontsize = \scriptsize, numbers = left, framerule = .3mm,
+  numbersep = 1mm,commandchars = \\\{\}}
+
+% reset text width
+\setbeamersize{text margin left = 5pt,text margin right = 5pt}
+
+\title[Short title]{Statistics for Biology and Health\\ Chapter 8 Refinements of the semiparametirc proportional hazards model\ 
+}
+\author[Author name]{Qi Guo}
+% \institute[UTD]{Department of Mathematical Sciences \\ The University of Texas at Dallas}
+\date{July 24,2019}
+% UTD logo on title page
+% \titlegraphic{\includegraphics[width=5cm]{mono_nsm_print_header.jpg}}
+\titlegraphic{\includegraphics[scale = .27]{UTDmono_NSM_header_RGB-1.png}}
+
+\begin{document}
+
+% default title thicker line
+% need to adjust
+% \frame{
+% \maketitle
+% \begin{tikzpicture}[remember picture, overlay]
+%   \def\xmargin{.1cm}     % Left and right margin of the title line
+%   \def\yshift{-0.1cm}   % Moves the title line upwards (-1.25cm moves title line downwards)
+%   \draw[mLightBrown,line width=2pt] (current page.west) ++(\xmargin,\yshift) -- ++({\paperwidth-2*\xmargin},0);
+% \end{tikzpicture}
+% }
+
+\frame{
+  \vspace{1cm}
+  \maketitle
+  \begin{tikzpicture}[remember picture, overlay]
+    \def\xmargin{.8cm}     % Left and right margin of the title line
+    \def\yshift{0.6cm}   % Moves the title line upwards 
+    \draw[mLightBrown,line width=2.2pt] (current page.west) ++(\xmargin,\yshift) -- ++({\paperwidth-2*\xmargin},0);
+  \end{tikzpicture}
+}
+
+
+% Set up UTD backgroud
+% Show background from here on
+\setbeamercolor*{item}{fg=red}
+\bgroup
+\usebackgroundtemplate{
+  \tikz[overlay,remember picture] \node[opacity=0.05, at=(current page.center)] {
+    \includegraphics[height=\paperheight,width=\paperwidth]{UTDbg}};}
+
+
+\begin{frame}{Contents}
+  \setbeamertemplate{section in toc}[sections numbered]
+  \tableofcontents[hideallsubsections]
+\end{frame}
+
+\section{Introduction}
+\begin{frame}{Introduction}
+\begin{itemize}
+\item  When the covariate may become a time-dependent variable, in notes before we introduce a $Z(t)$ instead of $Z$, and for commonly used model:
+\begin{equation*}
+h[t|Z(t)] = h_0(t)\exp[\beta' Z(t)] = h_0(t)\exp\big[\sum_{k=1}^{p}\beta_k Z_k(t) \big]
+\end{equation*}
+\item If the proportional hazard assumption is violated for a variable, we can stratify on this variable.Stratification fits a different baseline hazard function for each stratum, so that the form of the hazard function for different levels of this variable is not constrained by their hazards being proportional. 
+\item And the basic proportional hazards model can be extended to left-truncated survival data. 
+\end{itemize}
+\end{frame}
+
+\section{Time-Dependent Covariates}
+\begin{frame}{Time-Dependent Covariates}
+\begin{itemize}
+\item  Now our data based on a sample of size $n$, consists of the triple $[T_j,\delta_j, [Z_j(t), 0 \le t \le T_j]], \ j = 1, \cdots,n$, where $T_j$ is the time on study for the $j$th patient, $\delta_j$ is the event indicator, and $Z_j(t) = [Z_{j1}(t), \cdots, Z_{jp}(t)]'$ is the vector of covariates for the $j$th individual.
+\item And we assume that the censoring time and event are independent, the distinct event time $t_1 < t_2 < \cdots < t_D$, so $Z_{(i)}(t_i)$ is the covrariate associated with the individual whose failure time is $t_i$ and $R(t_i)$ is the risk set at time $t_i$, so the partial likelihood is given by:
+\begin{equation*}
+L(\beta) = \prod_{i=1}^{D}\frac{\exp \big[\sum_{b=1}^{p}\beta_b Z_{(i)b}(t_i)\big]}{\sum_{j\in R(t_i)}^{}\exp \big[\sum_{b=1}^{p}\beta_b Z_{jb}(t_i)\big]}
+\end{equation*}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Time-Dependent Covariates}
+\begin{itemize}
+\item In notes before we know there are a cut points here to coded the time-dependent variable into 0 and 1, if $t<$ time at which event occurs, let $Z(t) = 0$, and 1 o.w.
+\item And we skip this part as it's pretty close as before.
+\end{itemize}
+\end{frame}
+
+\section{Stratified Proportional Hazards Models}
+\begin{frame}{Coding Covariates}
+\begin{itemize}
+\item Here the subjects in the $j$th stratum have a arbitrary baseline hazards function $h_{0j}(t)$ and the effect of other explanatory variables on the hazards function can be represented by a proportional hazards model in that stratum as :
+\begin{equation*}
+h_j[t|Z(t)] = h_{0j}(t)\exp[\beta' Z(t)],\ j = 1,\cdots,s
+\end{equation*}
+\item The regression coefficients are assumed to be the same in each stratum although the baseline hazard functions may be different and completely unrelated.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Estimation and hypothesis testing}
+\begin{itemize}
+\item The partial log likelihood function is given by: 
+\begin{equation*}
+LL(\beta) = [LL_1(\beta)] +  [LL_2(\beta)] + \cdots +  [LL_s(\beta)]
+\end{equation*}
+where  $[LL_j(\beta)]$ is the log partial likelihood using only the data for those individuals in the $j$th stratum.
+\item A key assumption in using a stratified proportional hazards model is that the covariates are acting similarly on the baseline hazard function in each stratum.
+\item This can be tested by using either a likelihood ratio test or a Wald test.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Estimation and hypothesis testing}
+\begin{itemize}
+\item Fit the stratified model, which assumes common $\beta'$s in each stratum, and obtain the log partial likelihood, $LL(b)$.
+\item Using only data from the $j$th stratum, a Cox model is fit and the estimator $b_j$ and the log partial likelihood $LL_j(b_j)$are obtained. 
+\item The log likelihood under the model, with distinct covariates for each of the $s$ strata, is $\sum_{j=1}^{s}LL_j(b_j)$.
+\item The likelihood ratio chi square for the test that the $
+beta'$s are the same in each stratum is $-2[LL(b) - \sum_{j=1}^{s}LL_j(b_j)]$ which has a large-sample, chi-square distribution with $(s-1)p$ degrees of freedom under the $H_0$. 
+\end{itemize}
+\end{frame}
+
+\section{Left Truncation}
+\begin{frame}{Introduction}
+\begin{itemize}
+\item Actually all of the material in this chapter is similar as before, and for the left truncated data, it arises when the event time $X$ is the age of the subject and persons are not observed from birth but rather from some other time $V$ corresponding to their entry into the study.
+\item For example, the age, $X_i$, at death for the $i$th subject in a retirement center in California was recorded. Because an individual must survive to a sufficient age $V_i$ to enter the retirement community, and all individuals who died prior to entering the retirement community were not included in this study, the life lengths considered in this study are left-truncated.
+\item Another situation is when the event time $X$ is measured from some landmark, but only subjects who experience some intermediate event at time $V$ are to be included in the study. The times $V$ are sometimes called delayed entry times.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Formulate a proportional model}
+\begin{itemize}
+\item To formulate a proportional hazards regression model for a set of covariates $Z$, we model the conditional hazard rate of $t$, given $Z$ and $X>V$:
+\begin{equation*}
+h(t|Z, X>V) \cong \frac{P(X=t|Z, X>V)}{P(X\ge t|Z, X>V)}
+\end{equation*}
+\item If the event time $X$ and the entry time $V$ are conditionally independent, given the covariates $Z$, then $h(t|Z(t),X>V) = h(t|Z(t))$ 
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Estimate the coefficients}
+\begin{itemize}
+\item The partial likelihoods are modified to account for delayed entry into the risk set, and in notes before, we only need to add a delay entry time in R codes, so for the partial likelihoods will be different in the risk set $R(t)$.
+\item Define the risk set $R(t)$ at time $t$ as the set of all individuals who are still under study at a time just prior to $t$. Here, $R(t) = \lbrace j|V_j <t < T_j \rbrace$, and the rest are same. 
+\end{itemize}
+\end{frame}
+
+
+\end{document}

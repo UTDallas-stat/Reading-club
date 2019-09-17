@@ -1,0 +1,355 @@
+\documentclass{beamer}
+
+% Some common packages
+\usepackage{graphicx, color}
+\usepackage{alltt}
+\usepackage{booktabs, calc, rotating}
+\usepackage{natbib}
+\usepackage{multicol}
+\usepackage{amsmath, amsbsy, amssymb, amsthm, graphicx}
+\usepackage[english]{babel}
+\usepackage{xkeyval} 
+\usepackage{xfrac}
+\usepackage[normalem]{ulem}
+\usepackage{fancyvrb} 
+\usepackage{tikz, geometry, tkz-graph, xcolor}
+\usepackage[latin1]{inputenc}
+\usepackage{times}
+\usepackage[T1]{fontenc}
+
+% Some shortcuts
+\newcommand{\cov}{\mathrm{cov}}
+\newcommand{\dif}{\mathrm{d}}
+\newcommand{\bigbrk}{\vspace*{2in}}
+\newcommand{\smallbrk}{\vspace*{.1in}}
+\newcommand{\midbrk}{\vspace*{1in}}
+\newcommand{\red}[1]{{\color{red}#1}}
+\newcommand{\blue}[1]{{\color{blue}#1}}
+\newcommand{\green}[1]{{\color{green}#1}}
+\newcommand{\calc}[1]{{\fbox{\mbox{#1}}}}
+\newcommand{\Var}{\mathrm{Var}}%
+\newcommand{\Cov}{\mathrm{Cov}}%
+
+\usetheme[numbering=fraction, progressbar = frametitle]{metropolis}
+% section page?
+% \usetheme[sectionpage=none]{metropolis}
+% place progressbar under frametitle?
+% \usetheme[progressbar = frametitle]{metropolis}
+
+
+
+% To center title?
+\setbeamertemplate{title page}[default]
+% To add a rectangle box for title?
+% \setbeamercolor{titlelike}{parent = frametitle}   
+
+% item color and shape
+% \setbeamertemplate{itemize item}{\color{mDarkTeal}$\bullet$}
+% \setbeamertemplate{itemize subitem}{\color{mDarkTeal}$\bullet$}
+% \setbeamertemplate{itemize subsubitem}{\color{mDarkTeal}$\bullet$}
+
+% UTD colors
+\definecolor{warmgray10}{RGB}{118,106,98}
+\definecolor{warmgray2}{RGB}{213,210,202}
+\definecolor{warmgray1}{RGB}{230,230,230}
+\definecolor{flameOrange}{RGB}{199,91,18}
+\definecolor{ecoGreen}{RGB}{0,133,86}
+
+% only change item color 
+\setbeamercolor*{itemize item}{fg = mDarkTeal}
+\setbeamercolor*{itemize subitem}{fg = mDarkTeal}
+\setbeamercolor*{itemize subsubitem}{fg = mDarkTeal}
+% enumerate color
+\setbeamercolor*{enumerate item}{fg = mDarkTeal}
+\setbeamercolor*{enumerate subitem}{fg = mDarkTeal}
+\setbeamercolor*{enumerate subsubitem}{fg = mDarkTeal}
+% description color
+\setbeamercolor*{description item}{fg = mDarkTeal}
+\setbeamercolor*{description subitem}{fg = mDarkTeal}
+\setbeamercolor*{description subsubitem}{fg = mDarkTeal}
+
+% define blocks
+\newenvironment<>{problock}[1]{
+  \begin{actionenv}#2
+    \def\insertblocktitle{#1}
+    \par
+    \mode<presentation>{
+      \setbeamercolor{block title}{fg = white, bg = ecoGreen} %mDarkTeal}
+      \setbeamercolor{block body}{fg = black, bg = warmgray1}
+    }
+    \usebeamertemplate{block begin}}
+  {\par\usebeamertemplate{block end}\end{actionenv}}
+
+\newenvironment<>{defblock}[1]{
+  \begin{actionenv}#2
+    \def\insertblocktitle{#1}
+    \par
+    \mode<presentation>{
+      \setbeamercolor{block title}{fg = white,bg = flameOrange} %mDarkBrown}
+      \setbeamercolor{block body}{fg = black,bg = warmgray1}
+    }
+    \usebeamertemplate{block begin}}
+  {\par\usebeamertemplate{block end}\end{actionenv}}
+
+% \setbeamerfont{block title}{size={}}
+% \setbeamercolor{titlelike}{parent=structure,bg=flameOrange!80!black,fg=white} % title
+\mode
+<all>
+
+% fancy for Verbatim?
+\fvset{frame = single, framesep = 1mm,fontfamily = courier,
+  fontsize = \scriptsize, numbers = left, framerule = .3mm,
+  numbersep = 1mm,commandchars = \\\{\}}
+
+% reset text width
+\setbeamersize{text margin left = 5pt,text margin right = 5pt}
+
+\title[Short title]{Statistics for Biology and Health\\ Chapter 3 Nonparametric Estimation of Basic Quantities for Right-Censored and Left-Truncated Data\\ 
+}
+\author[Author name]{Qi Guo}
+% \institute[UTD]{Department of Mathematical Sciences \\ The University of Texas at Dallas}
+\date{July 20,2019}
+% UTD logo on title page
+% \titlegraphic{\includegraphics[width=5cm]{mono_nsm_print_header.jpg}}
+\titlegraphic{\includegraphics[scale = .27]{UTDmono_NSM_header_RGB-1.png}}
+
+\begin{document}
+
+% default title thicker line
+% need to adjust
+% \frame{
+% \maketitle
+% \begin{tikzpicture}[remember picture, overlay]
+%   \def\xmargin{.1cm}     % Left and right margin of the title line
+%   \def\yshift{-0.1cm}   % Moves the title line upwards (-1.25cm moves title line downwards)
+%   \draw[mLightBrown,line width=2pt] (current page.west) ++(\xmargin,\yshift) -- ++({\paperwidth-2*\xmargin},0);
+% \end{tikzpicture}
+% }
+
+\frame{
+  \vspace{1cm}
+  \maketitle
+  \begin{tikzpicture}[remember picture, overlay]
+    \def\xmargin{.8cm}     % Left and right margin of the title line
+    \def\yshift{0.6cm}   % Moves the title line upwards 
+    \draw[mLightBrown,line width=2.2pt] (current page.west) ++(\xmargin,\yshift) -- ++({\paperwidth-2*\xmargin},0);
+  \end{tikzpicture}
+}
+
+
+% Set up UTD backgroud
+% Show background from here on
+\setbeamercolor*{item}{fg=red}
+\bgroup
+\usebackgroundtemplate{
+  \tikz[overlay,remember picture] \node[opacity=0.05, at=(current page.center)] {
+    \includegraphics[height=\paperheight,width=\paperwidth]{UTDbg}};}
+
+
+\begin{frame}{Contents}
+  \setbeamertemplate{section in toc}[sections numbered]
+  \tableofcontents[hideallsubsections]
+\end{frame}
+
+\section{Introduction}
+\begin{frame}{Introduction}
+\begin{itemize}
+\item We assume the potential censoring time is unrelated to the potential event time.
+\item Suppose that the events occur at D distinct times $t_1 < t_2<\cdots<t_D$, and that at time $t_i$ there are $d_i$ events, $Y_i$ be the number of individuals who are at risks at time $t_i$.
+\item $Y_i$ is the number of individuals who are at risk at time $t_i$, and count of the number of individuals with a time on study of $t_i$ or more. 
+\item $d_i/Y_i$ provides an estimate of the conditional probability that an individual who survives to just prior to time $t_i$ experiences the event at time $t_i$.
+\item And now we need to find some basic estimator, like $S(t)$, $H(t)$, s.d, etc.
+\end{itemize}
+\end{frame}
+
+\section{Estimators of the Survival and Cumulative Hazard Functions for Right-Censored Data}
+\begin{frame}{KM and NA estimator}
+\begin{itemize}
+\item The standard estimator of the survival function, proposed by Kaplan and Meier, is called the Product-Limit estimator, and we introduce it in the notes before, it provides an efficient means of estimating the survival function for right-censored data.
+\item An alternate estimator of the cumulative hazard rate, which has better small-sample-size performance than the estimator based on the KM estimator, is Nelson-Aalen estimator.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{The Nelson-Aalen estimator}
+\begin{itemize}
+\item The Nelson-Aalen estimator has two primary uses in analyzing data. 
+ \begin{enumerate}
+\item The first is in selecting between parametric models for the time to event. If a given parametric model fits the data, the resulting graph will be approximately linear. For example, a plot of $\tilde{H}(t)$ versus $t$ will be approximately linear if the exponential distribution, with hazard rate $\lambda$, fits the data.
+\item A second is in providing crude estimates of the hazard rate $h(t)$. These estimates are the slope of the Nelson-Aalen estimator, and better estimate of hazard rate is about kernel smoothing and we introduce it before.
+\end{enumerate}
+\end{itemize}
+\end{frame}
+
+\section{Pointwise Confidence Intervals for the Survival Function}
+\begin{frame}{Confidence intervals for the survival function at a fixed time $t_0$}
+\begin{itemize}
+\item The intervals are constructed to assure, with a given confidence level $1-\alpha$ that the true value of the survival function, at a predetermined time $t_0$, falls in the interval we shall construct.
+\item And we need some additional notation except: $\hat{S}(t)$, like the KM estimator, $\hat{V}[\hat{S}(t)]$, like the variance of the KM estimator. Let
+ \begin{equation*}
+{\delta_s}^2(t) = \hat{V}[\hat{S}(t)] / {\hat{S}}^2(t)
+\end{equation*}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Confidence Interval}
+\begin{itemize}
+\item The most commonly used $100 \times (1-\alpha)\%$ confidence interval for the survival function at time $t_0$, termed the linear confidence interval, is defined by
+ \begin{equation*}
+[\hat{S}(t_0) - Z_{1-\alpha/2} \delta_s(t_0)\hat{S}(t_0), \hat{S}(t_0) + Z_{1-\alpha/2} \delta_s(t_0)\hat{S}(t_0)]
+\end{equation*}
+This is the confidence interval routinely constructed by most statistical packages.
+\item Better confidence intervals can be constructed by first transforming $\hat{S}(t_0)$.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Confidence Interval}
+\begin{itemize}
+\item 1. A log transformation of the cumulative hazard rate, The $100 \times (1-\alpha)\%$ log-transformed confidence interval for the survival function at $t_0$ is given by:
+ \begin{equation*}
+[\hat{S}(t_0)^{1/\theta}, \hat{S}(t_0)^{\theta}] where\
+\theta = \exp \bigg\lbrace \frac{Z_{1-\alpha/2}\delta_s(t_0)}{\ln[\hat{S}(t_0)]} \bigg\rbrace
+\end{equation*}
+2. The second transformation is an arcsine-square root transformation of the survival function which yields the following $100 \times (1-\alpha)\%$ confidence interval for the survival function:
+\begin{multline*}
+\sin^2 \bigg\lbrace max\bigg[0, arcsin(\hat{S}(t_0)^{1/2}) - 0.5 Z_{1-\alpha/2} \delta_s(t_0)\bigg(\frac{\hat{S}(t_0)}{1-\hat{S}(t_0)}\bigg)^{1/2}\bigg] \bigg\rbrace \\ \le S(t_0) \le \\ \sin^2 \bigg\lbrace min\bigg[\frac{\pi}{2}, arcsin(\hat{S}(t_0)^{1/2}) + 0.5 Z_{1-\alpha/2} \delta_s(t_0)\bigg(\frac{\hat{S}(t_0)}{1-\hat{S}(t_0)}\bigg)^{1/2}\bigg] \bigg\rbrace 
+\end{multline*}
+\end{itemize}
+\end{frame}
+
+\section{Confidence Bands for the Survival function}
+\begin{frame}{Confidence Bands}
+\begin{itemize}
+\item Sometimes it is of interest to find upper and lower confidence bands which guarantee, with a given confidence level, that the survival function falls within the band for all $t$ in some interval
+\item And we need to find two random functions $L(t)$ and $U(t)$, so that $1-\alpha = Pr[L(t)\le S(t)\le U(t), \ for \ all \ t_L \le t \le t_U]$, and we call such a $[L(t), U(t)]$ a $(1-\alpha) \times 100\%$ confidence band for $S(t)$.
+\item There are two main approaches to constructing confidence bands for $S(t)$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Constructing Confidence Bands}
+\begin{itemize}
+\item The first approach provides confidence bounds which are proportional to the pointwise confidence intervals, and these bands are called the equal probability or EP bands.
+\item To implement these bands we pick $t_L < t_U$ so that $t_L$ is greater than or equal to the smallest observed event time and $t_U$ is less than or equal to the largest observed event time.
+\item To construct confidence bands for $S(t)$, based on a sample of size $n$, define
+ \begin{equation*}
+a_L = \frac{n \delta^2_s(t_L)}{1+n\delta^2_s(t_L)}
+\end{equation*}
+and
+ \begin{equation*}
+a_U = \frac{n \delta^2_s(t_U)}{1+n\delta^2_s(t_U)}
+\end{equation*}
+The construction of the EP confidence bands requires that $0<a_L<a_U<1$
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Constructing Confidence Bands}
+\begin{itemize}
+\item To construct a $100\times(1-\alpha)\%$ confidence band for $S(t)$ over the range $[t_L,t_U]$,first find a confidence coefficient, $c_{\alpha}(a_L,a_U)$ from Table C.3 in Appendix C. 
+\item As in the case of $100\times(1-\alpha)\%$ pointwise confidence intervals at a fixed time, there are three possible forms for the confidence bands.
+\begin{enumerate}
+\item Linear:
+\begin{equation*}
+[\hat{S}(t) - c_{\alpha}(a_L,a_U)\delta_s(t)\hat{S}(t), \hat{S}(t) + c_{\alpha}(a_L,a_U)\delta_s(t)\hat{S}(t)]
+\end{equation*}
+\item Log-Transformed
+\item Arcsine-Square Root Transformed
+\end{enumerate}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Constructing Confidence Bands}
+\begin{itemize}
+\item The second approach to construct bands are not proportional to the pointwise confidence bounds, it is find the appropriate confidence coefficient $k_{\alpha}(a_L,a_U)$, from Table C.4 of Appendix C.
+\item And there are still have three possible forms for the confidence bands.
+\begin{enumerate}
+\item Linear:
+\begin{equation*}
+[\hat{S}(t) - \frac{k_{\alpha}(a_L,a_U)[1+n\delta^2_s(t)]}{n^{1/2}} \hat{S}(t),\hat{S}(t) + \frac{k_{\alpha}(a_L,a_U)[1+n\delta^2_s(t)]}{n^{1/2}} \hat{S}(t)]
+\end{equation*}
+\item Log-Transformed
+\item Arcsine-Square Root Transformed
+\end{enumerate}
+\end{itemize}
+\end{frame}
+
+\section{Point and Interval Estimates of the Mean Survival Time}
+\begin{frame}{Estimator of the Mean Survival Time}
+\begin{itemize}
+\item Before we know the mean time to the event $\mu$ is given by $\mu = \int_{0}^{\infty}S(t)dt$, and a natural estimator of $\mu$ is obtained by substituting $\hat{S}(t)$ for $S(t)$ in this expression.
+\item But this estimator is appropriate only when the largest observation corresponds to a death because in other cases, the KM estimator is not defined beyond the largest observation.
+ \item Two solutions:
+\begin{enumerate}
+\item Use Efron's tail correction to the KM estimator which changes the largest observed time to a death if it was a censored observation, and the mean restricted to the interval $[0, t_{max}]$ is made.
+\item Estimate the mean restricted to some preassigned interval $[0,\tau]$, where $\tau$ is chosen by the investigator to be the longest possible time to which anyone could survive.
+\end{enumerate}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Estimator of the Mean Survival Time}
+\begin{itemize}
+\item For either case, the estimated mean restricted to the interval $[0,\tau]$ with $\tau$ either the longest observed time or preassigned by the investigator, is given by:
+\begin{equation*}
+\hat{\mu}_{\tau} = \int_{0}^{\tau} \hat{S}(t)dt
+\end{equation*}	
+\item The variance of this estimator is:
+\begin{equation*}
+\hat{V}[\hat{\mu}_{\tau}] = \sum_{i=1}^{D} \big[\int_{t_i}^{\tau}\hat{S}(t)dt \big]^2 \frac{d_i}{Y_i(Y_i - d_i)}
+\end{equation*}	
+\item And the $100\times(1-\alpha) \%$ CI:
+\begin{equation*}
+\hat{\mu}_{\tau}  \pm Z_{1-\alpha/2} \sqrt{\hat{V}[\mu_{\tau}]}
+\end{equation*}	
+\end{itemize}
+\end{frame}
+
+\section{Summary Curves for Competing Risks}
+\begin{frame}{Summary Curves for Competing Risks}
+\begin{itemize}
+\item The summary survival curves presented before are based on the assumption that the event and censoring times are independent, but here in the case of competing risks data, it's suspect, and we have three techniques for summarizing competing risks data(we mentioned in Chapter 1).  
+\begin{enumerate}
+\item The first estimator which is commonly used is the complement of the KM estimator. Here occurrences of the other event are treated as censored observations
+\item The second estimator is the cumulative incidence function. This estimator is constructed as follows.
+\end{enumerate}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Summary Curves for Competing Risks}
+\begin{itemize}
+\item Let $t_1 < t_2 < \cdots <t_k$ be the distinct times where one of the competing risk occurs. At time $t_i$ let $Y_i$ be the number of subjects at risk, $r_i$ be the number of subjects with an occurrence of the event of interest at this time, and $d_i$ be the number of subjects with an occurrence of any of the other events of interest at this time, so $(d_i+r_i)$ is the number of subjects with an occurrence of any one of the competing risks at this time.
+\item The cumulative incidence function is defined by: 
+
+\[  \left\{
+\begin{array}{ll}
+	0 & if\ t\le t_1 \\
+	\sum\limits_{t_i\le t}^{}\bigg\lbrace \prod\limits_{j=1}^{i-1}\frac{1-[d_j+r_j]}{Y_j}\bigg\rbrace \frac{r_i}{Y_i} & if\ t_1\leq t
+\end{array} 
+\right. \]
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Summary Curves for Competing Risks}
+\begin{itemize}
+\item The variance of the cumulative incidence is estimated by: 
+\begin{equation*}
+V[CI(t)] = \sum_{t_i\le t}^{}{\hat{S}(t_i)}^2\big\lbrace [CI(t) -CI(t_i)]^2 \frac{r_i+d_i}{{Y_i}^2} + [1-2(CI(t)-CI(t_i))] \frac{r_i}{{Y_i}^2}\big\rbrace
+\end{equation*}	
+\item Confidence pointwise $(1-\alpha)100\%$ confidence intervals for the cumuative incidence are given by $CI(t) \pm Z_{1-\alpha/2}{V[CI(t)]}^{1/2}$
+\item The third probability used to summarize competing risks data is the conditional probability function for the competing risk.
+\\ For a particular risk, $K$. Let $CI_K(t)$ and $CI_{K^C}(t)$ be the cumulative incidence functions for risk $K$ and for all other risks lumped together, respectively. 
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Summary Curves for Competing Risks}
+\begin{itemize}
+\item The conditional probability function:
+\begin{equation*}
+CP_K(t) = \frac{CI_K(t)}{1-CI_{K^C}(t)}
+\end{equation*}
+\item The variance of this statistic is estimated by:
+\begin{equation*}
+V[CP_K(t)] = \frac{{\hat{S}(t^-)}^2}{[1-CI_{K^C}(t)]^4} \sum_{t_i\le t}^{}\frac{[1-CI_{K^C}(t_i)]^2 r_i + {CI_K(t_i)}^2 d_i}{{Y_i}^2}
+\end{equation*}
+\item The conditional probability is an estimate of the conditional probability of event $K'$s occurring by $t$ given that none of the other causes have occurred by $t$.
+\end{itemize}
+\end{frame}
+\end{document}

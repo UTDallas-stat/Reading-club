@@ -1,0 +1,359 @@
+\documentclass{beamer}
+
+% Some common packages
+\usepackage{graphicx, color}
+\usepackage{alltt}
+\usepackage{booktabs, calc, rotating}
+\usepackage{natbib}
+\usepackage{multicol}
+\usepackage{amsmath, amsbsy, amssymb, amsthm, graphicx}
+\usepackage[english]{babel}
+\usepackage{xkeyval} 
+\usepackage{xfrac}
+\usepackage[normalem]{ulem}
+\usepackage{fancyvrb} 
+\usepackage{tikz, geometry, tkz-graph, xcolor}
+\usepackage[latin1]{inputenc}
+\usepackage{times}
+\usepackage[T1]{fontenc}
+
+% Some shortcuts
+\newcommand{\cov}{\mathrm{cov}}
+\newcommand{\dif}{\mathrm{d}}
+\newcommand{\bigbrk}{\vspace*{2in}}
+\newcommand{\smallbrk}{\vspace*{.1in}}
+\newcommand{\midbrk}{\vspace*{1in}}
+\newcommand{\red}[1]{{\color{red}#1}}
+\newcommand{\blue}[1]{{\color{blue}#1}}
+\newcommand{\green}[1]{{\color{green}#1}}
+\newcommand{\calc}[1]{{\fbox{\mbox{#1}}}}
+\newcommand{\Var}{\mathrm{Var}}%
+\newcommand{\Cov}{\mathrm{Cov}}%
+
+\usetheme[numbering=fraction, progressbar = frametitle]{metropolis}
+% section page?
+% \usetheme[sectionpage=none]{metropolis}
+% place progressbar under frametitle?
+% \usetheme[progressbar = frametitle]{metropolis}
+
+
+
+% To center title?
+\setbeamertemplate{title page}[default]
+% To add a rectangle box for title?
+% \setbeamercolor{titlelike}{parent = frametitle}   
+
+% item color and shape
+% \setbeamertemplate{itemize item}{\color{mDarkTeal}$\bullet$}
+% \setbeamertemplate{itemize subitem}{\color{mDarkTeal}$\bullet$}
+% \setbeamertemplate{itemize subsubitem}{\color{mDarkTeal}$\bullet$}
+
+% UTD colors
+\definecolor{warmgray10}{RGB}{118,106,98}
+\definecolor{warmgray2}{RGB}{213,210,202}
+\definecolor{warmgray1}{RGB}{230,230,230}
+\definecolor{flameOrange}{RGB}{199,91,18}
+\definecolor{ecoGreen}{RGB}{0,133,86}
+
+% only change item color 
+\setbeamercolor*{itemize item}{fg = mDarkTeal}
+\setbeamercolor*{itemize subitem}{fg = mDarkTeal}
+\setbeamercolor*{itemize subsubitem}{fg = mDarkTeal}
+% enumerate color
+\setbeamercolor*{enumerate item}{fg = mDarkTeal}
+\setbeamercolor*{enumerate subitem}{fg = mDarkTeal}
+\setbeamercolor*{enumerate subsubitem}{fg = mDarkTeal}
+% description color
+\setbeamercolor*{description item}{fg = mDarkTeal}
+\setbeamercolor*{description subitem}{fg = mDarkTeal}
+\setbeamercolor*{description subsubitem}{fg = mDarkTeal}
+
+% define blocks
+\newenvironment<>{problock}[1]{
+  \begin{actionenv}#2
+    \def\insertblocktitle{#1}
+    \par
+    \mode<presentation>{
+      \setbeamercolor{block title}{fg = white, bg = ecoGreen} %mDarkTeal}
+      \setbeamercolor{block body}{fg = black, bg = warmgray1}
+    }
+    \usebeamertemplate{block begin}}
+  {\par\usebeamertemplate{block end}\end{actionenv}}
+
+\newenvironment<>{defblock}[1]{
+  \begin{actionenv}#2
+    \def\insertblocktitle{#1}
+    \par
+    \mode<presentation>{
+      \setbeamercolor{block title}{fg = white,bg = flameOrange} %mDarkBrown}
+      \setbeamercolor{block body}{fg = black,bg = warmgray1}
+    }
+    \usebeamertemplate{block begin}}
+  {\par\usebeamertemplate{block end}\end{actionenv}}
+
+% \setbeamerfont{block title}{size={}}
+% \setbeamercolor{titlelike}{parent=structure,bg=flameOrange!80!black,fg=white} % title
+\mode
+<all>
+
+% fancy for Verbatim?
+\fvset{frame = single, framesep = 1mm,fontfamily = courier,
+  fontsize = \scriptsize, numbers = left, framerule = .3mm,
+  numbersep = 1mm,commandchars = \\\{\}}
+
+% reset text width
+\setbeamersize{text margin left = 5pt,text margin right = 5pt}
+
+\title[Short title]{Statistics for Biology and Health\\ Chapter 11 Multivariate Survival Analysis\ 
+}
+\author[Author name]{Qi Guo}
+% \institute[UTD]{Department of Mathematical Sciences \\ The University of Texas at Dallas}
+\date{July 27,2019}
+% UTD logo on title page
+% \titlegraphic{\includegraphics[width=5cm]{mono_nsm_print_header.jpg}}
+\titlegraphic{\includegraphics[scale = .27]{UTDmono_NSM_header_RGB-1.png}}
+
+\begin{document}
+
+% default title thicker line
+% need to adjust
+% \frame{
+% \maketitle
+% \begin{tikzpicture}[remember picture, overlay]
+%   \def\xmargin{.1cm}     % Left and right margin of the title line
+%   \def\yshift{-0.1cm}   % Moves the title line upwards (-1.25cm moves title line downwards)
+%   \draw[mLightBrown,line width=2pt] (current page.west) ++(\xmargin,\yshift) -- ++({\paperwidth-2*\xmargin},0);
+% \end{tikzpicture}
+% }
+
+\frame{
+  \vspace{1cm}
+  \maketitle
+  \begin{tikzpicture}[remember picture, overlay]
+    \def\xmargin{.8cm}     % Left and right margin of the title line
+    \def\yshift{0.6cm}   % Moves the title line upwards 
+    \draw[mLightBrown,line width=2.2pt] (current page.west) ++(\xmargin,\yshift) -- ++({\paperwidth-2*\xmargin},0);
+  \end{tikzpicture}
+}
+
+
+% Set up UTD backgroud
+% Show background from here on
+\setbeamercolor*{item}{fg=red}
+\bgroup
+\usebackgroundtemplate{
+  \tikz[overlay,remember picture] \node[opacity=0.05, at=(current page.center)] {
+    \includegraphics[height=\paperheight,width=\paperwidth]{UTDbg}};}
+
+
+\begin{frame}{Contents}
+  \setbeamertemplate{section in toc}[sections numbered]
+  \tableofcontents[hideallsubsections]
+\end{frame}
+
+\section{The accelerated failure time model}
+\begin{frame}{Introduction}
+\begin{itemize}
+\item Let $X$ denote the time to the event and $Z$ a vector of fixed time explanatory covariates. 
+\item The accelerated failure time model states that the survival function of an individual with covariate $Z$ at time $x$ is the same as the survival function of an individual with a baseline survival function at a time $x\exp(\theta'z)$, where $\theta' = (\theta_1, \cdots, \theta_p)$ is a vector of regression coefficients.
+\item The accelerated failure time model is defined by the relationship:
+\begin{equation*}
+S(x|Z) = S_0[\exp(\theta'Z)x], \ for \ all\  x
+\end{equation*}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{The accelerated failure time model}
+\begin{itemize}
+\item The factor $\exp(\theta'Z)$ is called an accelerating factor telling the investigator how a change in covariate values changes the time scale from the baseline time scale.
+\item One application of this model is that the hazard rate for an individual with covariate $Z$ is related to a baseline hazard by:
+\begin{equation*}
+h(x|Z) = \exp(\theta' Z)h_0[\exp(\theta' Z)x], \ for \ all\ x
+\end{equation*}
+\item The second implication is that median time to the event with a covariate $Z$ is the baseline median time to event divided by the acceleration factor.
+\item About the parametric regression model, we can look at the notes before.
+\end{itemize}
+\end{frame}
+
+\section{The frailty model}
+\begin{frame}{The frailty model}
+\begin{itemize}
+\item Before the analysis based on the assumption that the survival times of distinct individuals are independent of each other, but it is quite probable that there is some association within groups of survival times in some sample.
+\item A model for modeling association between individual survival times within subgroups is the use of a frailty model. A frailty is an unobservable random effect shared by subjects within a subgroup.
+\item The most common model for the frailty is a common random effect that acts multiplicatively on the hazard rates of all subgroup members. In this model, families with a large value of the frailty will experience the event at earlier times then families with small values of the random effect.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{The frailty model}
+\begin{itemize}
+\item The most common model for a frailty is the so-called shared frailty model extension of the proportional hazards regression model. 
+\item Assume that the hazard rate for the $j$th subject in the $i$th subgroup, given the frailty, is of the form
+\begin{equation*}
+h_{ij}(t) = h_0(t)\exp(\sigma \omega_i + \beta' Z_{ij}), i=1,\cdots,G, j = 1,\cdots, n_i
+\end{equation*}
+where $h_0(t)$ is an arbitrary baseline hazard rate, $Z_{ij}$ is the vector of covariates, $\beta$ the vector of regression coefficients, and $\omega_1, \cdots, \omega_G$ the frailties.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{The frailty model}
+\begin{itemize}
+\item Here assume that $\omega$'s are an independent sample from some distribution with mean 0 and variance 1. In some applications, it's more convenient to write the model as:
+\begin{equation*}
+h_{ij}(t) = h_0(t) \mu_i \exp(\beta' Z_{ij}), i = 1,\cdots,G, j = 1,\cdots, n_i
+\end{equation*}
+where the $\mu_i$'s are an independent and identically distributed sample from a distribution with mean 1 and some unknown variance. 
+\item When nature picks a value of $\mu_i$ greater than 1, it means individuals within a given family tend to fail at a rate faster than under an independence model where $\mu_i$ equal to 1 with probability 1.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{The frailty model}
+\begin{itemize}
+\item When we collect data, the $\omega_i$'s are not observable, so the joint distribution of the survival times of individuals within a group, found by taking the expectation of $\exp[-\sum_{j=1}^{n_i}H_{ij}(t)]$ with respect to $\mu_i$ is given by:
+\begin{equation*}
+\begin{split}
+S(x_{i1},\cdots,x_{i n_i}) &= P[X_{i1}>x_{i1}, \cdots, X_{i n_i}>x_{i n_i}] \\ 
+& = LP[\sum_{j=1}^{n_i}H_0(x_{ij}) \exp(\beta'Z_{ij})]
+\end{split}
+\end{equation*}
+Here, $LP(\nu) = E_{U}[\exp (-U\nu)]$ is the Laplace transform of the frailty $U$.
+\end{itemize}
+\end{frame}
+
+\section{Score Test for Association}
+\begin{frame}{Score Test for Association}
+\begin{itemize}
+\item To test for association between subgroups of individuals, a score test has been developed by Commenges and Andersen.The test can be used to test for association, after an adjustment for covariate effects has been made using Cox's proportional hazards model, or can be applied when there are no covariates present.
+\item Here we have $G$ subgroups of subjects, and within the $i$th subgroup, we have $n_i$ individuals. 
+\item We are interested in testing the $H_0: \sigma = 0$ and $H_A;\sigma \neq 0$, no distributional assumptions are made about the distribution of the random effects $\omega_i$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Test statistics}
+\begin{itemize}
+\item The test statistics consists of the on study time $T_{ij}$, the event indicator $\delta_{ij}$, and the covariate vector $Z_{ij}$ for the $j$th observation in the $i$th group, and the at risk indicator $Y_{ij}(t)$ at time $t$ for an observation.   
+\item Then, we fit the Cox proportional hazards model, $h(t|Z_{ij}) = h_0(t)\exp(\beta'Z_{ij})$, and we obtain the partial maximum likelihood estimates $b$ of $\beta$ and the Breslow estimate $\hat{H}_0(t)$ of the cumulative baseline hazard rate. Let
+\begin{equation*}
+S^{(0)}(t) = \sum_{i=1}^{G}\sum_{j=1}^{n_i}Y_{ij}(t)\exp(b'Z_{ij})
+\end{equation*}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Test statistics}
+\begin{itemize}
+\item Then compute $M_{ij} = \delta_{ij} - \hat{H}_0(T_{ij})\exp(b'Z_{ij})$, the martingale residual for the $ij$th individual. The score statistic is given by: 
+\begin{equation*}
+T = \sum_{i=1}^{G}\bigg\lbrace \sum_{j=1}^{n_i} M_{ij} \bigg\rbrace ^2  - D + C
+\end{equation*}
+where $D$ is the total number of deaths and:
+\begin{equation*}
+C = \sum_{i=1}^{G}\sum_{j=1}^{n_i} \frac{\delta_{ij}}{S^{(0)}(T_{ij})^2}\sum_{h=1}^{G}\big[
+\sum_{k=1}^{n_i}Y_{hk}(T_{ij}) \exp(b'Z_{hk}) \big]^2
+\end{equation*}
+\item  The test statistic can also be written as:
+\begin{equation*}
+T = \sum_{i=1}^{G}\sum_{j=1}^{n_i}\sum_{k=1,k\neq j}^{n_j}M_{ij}M_{ik} + \big(\sum_{i=1}^{G}\sum_{j=1}^{n_i}M^2_{ij} - N \big) +C
+\end{equation*}
+where $N$ is the total sample size.
+\end{itemize}
+\end{frame}
+
+\section{Estimation for the Gamma Frailty Model}
+\begin{frame}{Introduction}
+\begin{itemize}
+\item  Now we estimate the risk coefficients, baseline hazard rate, and frailty parameter for a frailty model based on a gamma distributed frailty. 
+\item Assume that for the $j$th individual in the $i$th group, the hazard rate given the unobservable frailty $\mu_i$ is of the from $h_{ij}(t)  =h_0(t)\mu_i \exp(\beta' Z_{ij})$ with $\mu_i$ i.i.d of gamma distribution which is: 
+\begin{equation*}
+g(\mu) = \frac{\mu^{(1/\theta - 1) \exp(-\mu/\theta)}}{\Gamma[1/\theta]\theta^{1/\theta}}
+\end{equation*}
+where the mean is 1 and the variance is $\theta$, so that large values of $\theta$ reflect a greater degree of heterogeneity among groups and a stronger association within groups. 
+\end{itemize}
+\end{frame}
+
+\begin{frame}{The estimation for the Gamma Frailty Model}
+\begin{itemize}
+\item The joint survival function for the $n_i$ individuals within the $i$th group is given by:
+\begin{equation*}
+\begin{split}
+S\lbrace x_{i1},\cdots, x_{i n_i} \rbrace &= P[X_{i1} > x_{i1}, \cdots, X_{i n_i}>x_{i n_i}] \\
+& = \big[1+ \theta\sum_{j=1}^{n_i}H_0(x_{ij})\exp(\beta' Z_{ij})\big]^{-1/\theta}
+\end{split}
+\end{equation*}
+\item The association between group members as measured by Kendall's $\tau$ is $\theta/(\theta+2)$, and $\theta=0$ corresponds to the case of independence.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{The estimation for the Gamma Frailty Model}
+\begin{itemize}
+\item Estimation for this model is based on the log likelihood function, the usual triple $(T_{ij}, \delta_{ij}, Z_{ij}), \ i =1,\cdots,G, j = 1,\cdots,n_i$. Let $D_i = \sum_{j=1}^{n_i}\delta_{ij}$ be the number of events in the $i$th group. Then the observable log likelihood is given by: 
+\begin{equation*}
+\begin{split}
+L(\theta, \beta) &= \sum_{i=1}^{G} D_i \ln{\theta} - \ln[\Gamma(1/\theta)] +\ln[\Gamma(1/\theta + D_i)] \\
+& - (1/\theta +D_i)\ln \big[1+\theta\sum_{j=1}^{n_i}H_0(T_{ij}\exp(\beta'Z_{ij}))\big] \\ & + \sum_{j=1}^{n_i}\delta_{ij}\lbrace \beta' Z_{ij} + \ln[h_0(T_{ij})] \rbrace
+\end{split}
+\end{equation*}
+\item If one assumes a parametric form for $h_0()$, the m.l.e can be used.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{EM algorithm}
+\begin{itemize}
+\item The EM algorithm provides a means of maximizing complex likelihoods. 
+\item In the E (or Estimation) step of the algorithm the expected value of $L_{FULL}$ is computed, given the current estimates of the parameters and the observable data. 
+\item In the M (or maximization) step of the algorithm, estimates of the parameters which maximize the expected value of $L_{FULL}$ from the E step are obtained. The algorithm iterates between these two steps until convergence.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{EM algorithm}
+\begin{itemize}
+\item To apply the E-step to our problem, given the
+data and the current estimates of the parameters, the $\mu_i$'s are independent gamma random variables with shape parameters $A_i = [1/\theta + D_i]$ and scale parameters $C_i = [1/\theta + \sum_{i=1}^{G}H_0(T_{ij}\exp(\beta'Z_{ij}))]$.Thus
+\begin{equation*}
+E[\mu_i|Data] = \frac{A_i}{C_i} \ and \ E[\ln\mu_i] = [\psi(A_i)-\ln C_i]
+\end{equation*}
+where $\psi()$ is the digamma function. Substituting these values in $L_1(\theta)$ and $L_2(\beta, H_0)$ complete the E-step of the algorithm.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{EM algorithm}
+\begin{itemize}
+\item For the M-step, note that $E[L_2(\beta, H_0)|Data]$ is expressed as:
+\begin{equation*}
+E[L_2(\beta, H_0)|Data] = \sum_{i=1}^{G}\sum_{j=1}^{n_i}\delta_{ij}[\beta' Z_{ij} +\ln h_0(T_{ij})] - \frac{A_i}{C_i} H_0(T_{ij})\exp(\beta' Z_{ij})
+\end{equation*}
+which depends on $h_0()$.
+\item If we let $t_{(k)}$ be the $k$th smallest death time, regardless of subgroup, and $m_{(k)}$ the number of deaths at time $t_{(k)}$, for $k=1,\cdots,D$ and denote bt $\hat{\mu}_h$ and $Z_h$ the expected value of frailty and the covariate vector for $h$th individual, the partial likelihood to be maximized in the M step is 
+\begin{equation*}
+L_3(\beta) = \sum_{k=1}^{D} \bigg \lbrace S_{(k)} - m_{(k)}\ln \bigg[\sum_{h \in R(T_{(k)})}^{}\hat{\mu}_h \exp(\beta' Z_h)\bigg] \bigg\rbrace
+\end{equation*}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{EM algorithm}
+\begin{itemize}
+\item where $S_{(k)}$ is the sum of the covariates of individuals who died at time $t_{(k)}$.
+\item An estimate of the $H_0(t)$ from this step is given by:
+\begin{equation*}
+\hat{H}_0(t) = \sum_{t_{(k)}\le t}^{}h_{k0}
+\end{equation*}
+where
+\begin{equation*}
+h_{k0} = \frac{m_{(k)}}{\sum_{h \in R(t_{(k)})}^{}\hat{\mu}_h \exp(\beta' Z_h)}
+\end{equation*}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{EM algorithm}
+\ \  Here we use a grid of possible values for the frailty parameter $\theta$. For \\ \ \ each fixed value of $\theta$, the following EM algorithm is used to obtain an\\ \ \ estimate of $\beta_\theta$
+\begin{itemize}
+\item Step 0. Provide an initial estimate of $\beta$(and hence $h_{k0}$)
+\item Step 1.(E step) Compute $\hat{\mu}_h, h = 1,\cdots,n$ based on the current values of the parameters.
+\item Step 2.(M step) Update the estimate of $\beta_\theta$(and the $h_{k0}$) using the partial likelihood in $L_3(\beta)$.
+\item Step 3. Iterate between steps 1 and 2 until convergence.
+
+\end{itemize}
+\end{frame}
+
+
+\end{document}

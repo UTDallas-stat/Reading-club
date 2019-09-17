@@ -1,0 +1,357 @@
+\documentclass{beamer}
+
+% Some common packages
+\usepackage{graphicx, color}
+\usepackage{alltt}
+\usepackage{booktabs, calc, rotating}
+\usepackage{natbib}
+\usepackage{multicol}
+\usepackage{amsmath, amsbsy, amssymb, amsthm, graphicx}
+\usepackage[english]{babel}
+\usepackage{xkeyval} 
+\usepackage{xfrac}
+\usepackage[normalem]{ulem}
+\usepackage{fancyvrb} 
+\usepackage{tikz, geometry, tkz-graph, xcolor}
+\usepackage[latin1]{inputenc}
+\usepackage{times}
+\usepackage[T1]{fontenc}
+
+% Some shortcuts
+\newcommand{\cov}{\mathrm{cov}}
+\newcommand{\dif}{\mathrm{d}}
+\newcommand{\bigbrk}{\vspace*{2in}}
+\newcommand{\smallbrk}{\vspace*{.1in}}
+\newcommand{\midbrk}{\vspace*{1in}}
+\newcommand{\red}[1]{{\color{red}#1}}
+\newcommand{\blue}[1]{{\color{blue}#1}}
+\newcommand{\green}[1]{{\color{green}#1}}
+\newcommand{\calc}[1]{{\fbox{\mbox{#1}}}}
+\newcommand{\Var}{\mathrm{Var}}%
+\newcommand{\Cov}{\mathrm{Cov}}%
+
+\usetheme[numbering=fraction, progressbar = frametitle]{metropolis}
+% section page?
+% \usetheme[sectionpage=none]{metropolis}
+% place progressbar under frametitle?
+% \usetheme[progressbar = frametitle]{metropolis}
+
+
+
+% To center title?
+\setbeamertemplate{title page}[default]
+% To add a rectangle box for title?
+% \setbeamercolor{titlelike}{parent = frametitle}   
+
+% item color and shape
+% \setbeamertemplate{itemize item}{\color{mDarkTeal}$\bullet$}
+% \setbeamertemplate{itemize subitem}{\color{mDarkTeal}$\bullet$}
+% \setbeamertemplate{itemize subsubitem}{\color{mDarkTeal}$\bullet$}
+
+% UTD colors
+\definecolor{warmgray10}{RGB}{118,106,98}
+\definecolor{warmgray2}{RGB}{213,210,202}
+\definecolor{warmgray1}{RGB}{230,230,230}
+\definecolor{flameOrange}{RGB}{199,91,18}
+\definecolor{ecoGreen}{RGB}{0,133,86}
+
+% only change item color 
+\setbeamercolor*{itemize item}{fg = mDarkTeal}
+\setbeamercolor*{itemize subitem}{fg = mDarkTeal}
+\setbeamercolor*{itemize subsubitem}{fg = mDarkTeal}
+% enumerate color
+\setbeamercolor*{enumerate item}{fg = mDarkTeal}
+\setbeamercolor*{enumerate subitem}{fg = mDarkTeal}
+\setbeamercolor*{enumerate subsubitem}{fg = mDarkTeal}
+% description color
+\setbeamercolor*{description item}{fg = mDarkTeal}
+\setbeamercolor*{description subitem}{fg = mDarkTeal}
+\setbeamercolor*{description subsubitem}{fg = mDarkTeal}
+
+% define blocks
+\newenvironment<>{problock}[1]{
+  \begin{actionenv}#2
+    \def\insertblocktitle{#1}
+    \par
+    \mode<presentation>{
+      \setbeamercolor{block title}{fg = white, bg = ecoGreen} %mDarkTeal}
+      \setbeamercolor{block body}{fg = black, bg = warmgray1}
+    }
+    \usebeamertemplate{block begin}}
+  {\par\usebeamertemplate{block end}\end{actionenv}}
+
+\newenvironment<>{defblock}[1]{
+  \begin{actionenv}#2
+    \def\insertblocktitle{#1}
+    \par
+    \mode<presentation>{
+      \setbeamercolor{block title}{fg = white,bg = flameOrange} %mDarkBrown}
+      \setbeamercolor{block body}{fg = black,bg = warmgray1}
+    }
+    \usebeamertemplate{block begin}}
+  {\par\usebeamertemplate{block end}\end{actionenv}}
+
+% \setbeamerfont{block title}{size={}}
+% \setbeamercolor{titlelike}{parent=structure,bg=flameOrange!80!black,fg=white} % title
+\mode
+<all>
+
+% fancy for Verbatim?
+\fvset{frame = single, framesep = 1mm,fontfamily = courier,
+  fontsize = \scriptsize, numbers = left, framerule = .3mm,
+  numbersep = 1mm,commandchars = \\\{\}}
+
+% reset text width
+\setbeamersize{text margin left = 5pt,text margin right = 5pt}
+
+\title[Short title]{Statistics for Biology and Health\\ Chapter 9 Additive Hazards Regression Models\ 
+}
+\author[Author name]{Qi Guo}
+% \institute[UTD]{Department of Mathematical Sciences \\ The University of Texas at Dallas}
+\date{July 25,2019}
+% UTD logo on title page
+% \titlegraphic{\includegraphics[width=5cm]{mono_nsm_print_header.jpg}}
+\titlegraphic{\includegraphics[scale = .27]{UTDmono_NSM_header_RGB-1.png}}
+
+\begin{document}
+
+% default title thicker line
+% need to adjust
+% \frame{
+% \maketitle
+% \begin{tikzpicture}[remember picture, overlay]
+%   \def\xmargin{.1cm}     % Left and right margin of the title line
+%   \def\yshift{-0.1cm}   % Moves the title line upwards (-1.25cm moves title line downwards)
+%   \draw[mLightBrown,line width=2pt] (current page.west) ++(\xmargin,\yshift) -- ++({\paperwidth-2*\xmargin},0);
+% \end{tikzpicture}
+% }
+
+\frame{
+  \vspace{1cm}
+  \maketitle
+  \begin{tikzpicture}[remember picture, overlay]
+    \def\xmargin{.8cm}     % Left and right margin of the title line
+    \def\yshift{0.6cm}   % Moves the title line upwards 
+    \draw[mLightBrown,line width=2.2pt] (current page.west) ++(\xmargin,\yshift) -- ++({\paperwidth-2*\xmargin},0);
+  \end{tikzpicture}
+}
+
+
+% Set up UTD backgroud
+% Show background from here on
+\setbeamercolor*{item}{fg=red}
+\bgroup
+\usebackgroundtemplate{
+  \tikz[overlay,remember picture] \node[opacity=0.05, at=(current page.center)] {
+    \includegraphics[height=\paperheight,width=\paperwidth]{UTDbg}};}
+
+
+\begin{frame}{Contents}
+  \setbeamertemplate{section in toc}[sections numbered]
+  \tableofcontents[hideallsubsections]
+\end{frame}
+
+\section{Introduction}
+\begin{frame}{Introduction}
+\begin{itemize}
+\item  The regression models for survival data based on a proportional hazards model before show the effect of covariates act multiplicatively on some unknown baseline hazard rate, and covariates which do not act on the baseline hazard rate in this fashion were modeled either by the inclusion of a time-dependent covariate or by stratification. 
+\item Now consider an alternative to the semiparametric multiplicative hazard model, namely, the additive hazard model, which is expressed by:
+\begin{equation*}
+h[t|Z(t)] = \beta_0(t) + \sum_{k=1}^{p} \beta_k(t)Z_k(t)
+\end{equation*}
+where the $\beta_k(t)$'s are covariate functions to be estimated from the data.
+\end{itemize}
+\end{frame}
+
+\section{Aalen's Nonparametric, Additive Hazard Model}
+\begin{frame}{Introduction}
+\begin{itemize}
+\item  The first additive hazard model is Aalen's Nonparametric model, the unknown risk coefficients in this model are allowed to be functions of time so that the effect of a covariate may vary over time.
+\item And the risk coefficients can be estimated by a least-squares technique.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Notations}
+\begin{itemize}
+\item The data consists of a sample $[T_j,\delta_j,Z_j(t)],\ j = 1,\cdots,n$, $T_j$ is the on study time, $\delta_j$ the event indicator, and $Z_j(t) = [Z_{j1}(t), \cdots, Z_{jp}(t)]$ is a $p-$vector of, possibly, time-dependent covariates. For the $j$th individual define:
+\[ Y_j(t)= \left\{
+\begin{array}{ll}
+1 \ if\ individual\ j\ is\ under\ observation\ (at\ risk) at\ time\ t \\
+0 \ otherwise
+\end{array} 
+\right. \] 
+\item If the data is left-truncated, then, $Y_j(t)$ is 1 only between an individual's entry time into the study and exit time from the study. For right-censored data $Y_j(t)$ is 1 if $t\le T_j$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Aalen's Nonparametric additive hazard model}
+\begin{itemize}
+\item For individual $j$, the conditional hazard rate at time $t$, given $Z_j(t)$, by
+\begin{equation*}
+h[t|Z_j(t)] = \beta_0(t) + \sum_{k=1}^{p}\beta_k(t)Z_{jk}(t)
+\end{equation*}
+where $\beta_k(t), \ k = 1,\cdots,p$ are unknown parametric functions to be estimated.
+\item Directly estimate the cumulative risk function like before $B_k(t)$, defined by:
+\begin{equation*}
+B_k(t) = \int_{0}^{t} \beta_k(u)du, \ k = 0,1,\cdots,p
+\end{equation*}
+\item Crude estimates of $\beta_k(t)$ are given by the slope of estimate of $B_k(t)$. Better estimates of $
+\beta_k(t)$ can be obtained by using a kernel-smoothing technique.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Least-squares estimate}
+\begin{itemize}
+\item To find the estimates of $B_k(t)$ a least-squares method is used, define an $n \times (p+1)$ design matrix, $X(t)$, as follows:
+\item For the $i$th row of $X(t)$, set $X_i(t) = Y_i(t)(1,Z_j(t))$. That's $X_i(t) = (1,Z_{j1}(t),\cdots, Z_{jp}(t))$ if the $i$th subject is at risk at time $t$, and a $p+1$ vector of zeros if this subject is not at risk. Let $I(t)$ be the $n \times 1$ vector with $i$th element equal to 1 if subject $i$ dies at $t$ and 0 otherwise.
+\item The least-squares estimate of the vector $B(t) = (B_0(t), B_1(t), \cdots, B_p(t))'$ is 	
+\begin{equation*}
+\hat{B}(t) = \sum_{T_i \le t}^{}[X'(T_i)X(T_i)]^{-1} X'(T_i)I(T_i)
+\end{equation*}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Least-squares estimate}
+\begin{itemize}
+\item The variance-covariance matrix of $B(t)$ is:
+\begin{equation*}
+\hat{Var}(\hat{B}(t)) = \sum_{T_i \le t}[X'(T_i)X(T_i)]^{-1}X'(T_i)I^{D}(T_i)X(T_i) \lbrace [X'(T_i)X(T_i)]^{-1} \rbrace '
+\end{equation*}
+\item $I^{D}(t)$ is the diagonal matrix with diagonal elements equal to $I(t)$. The estimator $B(t)$ only exists up tp the time $t$, which is the smallest time at which $X'(T_i)X(T_i)$ becomes singular.
+\item The estimators $\hat{B_k}(t)$ estimate the integral of the regression function $b_k$ in the same fashion as the NA estimator discussed in Chapter 3.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Example}
+\begin{itemize}
+\item Here we have a single covariate $Z_{j1}$ equal to 1 if the $j$th observation is from sample 1 and 0 otherwise. The design matrix is:
+$$X(t) = 
+\begin{pmatrix} 
+	Y_1(t) & Y_1(t)Z_{11} \\
+ \cdots	& \cdots \\
+	Y_n(t) & Y_n(t)Z_{1n}
+\end{pmatrix}
+\quad
+$$
+\item and 
+$$X'(t)X(t) = 
+\begin{pmatrix} 
+N_1(t)+N_2(t) & N_1(t) \\
+N_1(t) & N_1(t)
+\end{pmatrix}
+\quad
+$$
+\item Here $N_k(t)$ is the number at risk in the $k$th group at time $t$. The $X'(t)X(t)$ is nonsingular as long as there is at least one subject still at risk in each group.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Example}
+\begin{itemize}
+\item From the formula before find that:
+\begin{equation*}
+\begin{split}
+\hat{B}_0(t) &= \sum_{T_i \le t} d_i \big\lbrace \frac{1}{N_2(T_i)} - \frac{Z_{i1}}{N_2(T_i)} \big\rbrace \\
+&= \sum_{T_i \le t, i\in sample \ 2}^{}\frac{d_i}{N_2(T_i)}. 
+\end{split}
+\end{equation*}
+\item The NA estimator of the hazard rate using the data in sample 2 only. Also: 
+\begin{equation*}
+\begin{split}
+\hat{B}_1(t) &= \sum_{T_i \le t} d_i \big\lbrace \frac{-1}{N_2(T_i)} + Z_{i1}\big[ \frac{1}{N_1(T_i)} + \frac{1}{N_2(T_i)} \big] \big\rbrace \\
+&= \sum_{T_i \le t, i\in sample \ 1}^{}\frac{d_i}{Y_1(T_i)} - \sum_{T_i \le t, i\in sample \ 2}^{}\frac{d_i}{Y_2(T_i)}. 
+\end{split}
+\end{equation*}
+\item The difference of the NA estimators of the hazard rate in the two samples.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{The Weighted additive hazard model}
+\begin{itemize}
+\item To make it more flexible, when test the hypothesis $H_0: \beta_k(t) = 0$ for all $t\le \tau$ and all $k$ in some set $k$, it based on a weighted stochastic integral of the estimated value of $\beta_k(t)$ as compared to its expected value, zero, under $H_0$.
+\item To perform the test we need a matrix of weights to use in constructing the test, this weight matrix is a diagonal matrix $W(t)$ with diagonal elements $W_j(t), j=1,\cdots,p+1$. The test statistic:
+\begin{equation*}
+U = \sum_{T_i}^{} W(T_i)[X'(T_i)X(T_i)]^{-1} X'(T_i)I(T_i)
+\end{equation*}
+\item The $(j+1)$st element of $U$ is the test statistic for testing the hypothesis $H_j: \beta_j(t)=0$
+\end{itemize}
+\end{frame}
+
+\begin{frame}{The Weighted additive hazard model}
+\begin{itemize}
+\item The elements of $U$ are weighted sums of the increments of $\hat{B}_k(t)$ and elements of $V$ are also obtained from elements of $\hat{Var}(\hat{B}(t))$.
+\item Using the statistics a simultaneous test of the hypothesis that $\beta_j(t) = 0$ for all $j\in J$ where $J$ is a subset of $\lbrace 0, 1, \cdots, p+1, \rbrace$ is 
+\begin{equation*}
+X = U'_J V_J^{-1}IU_J
+\end{equation*}
+\item Here $U_J$ is the subvector of $U$ corresponding to elements in $J$ and $V_J$ the corresponding subcovariance matrix.
+\item And we can choose the weight function like before.
+\end{itemize}
+\end{frame}
+
+
+\section{Lin and Ying's Additive Hazards Model}
+\begin{frame}{Lin and Ying's Additive Hazards Model}
+\begin{itemize}
+\item The Lin and Ying additive model for the conditional hazard rate for individual $j$ with covariate vector $Z_j(t)$ is:
+\begin{equation*}
+h(t|Z_j(t)) = \alpha_0(t) + \sum_{k=1}^{p}\alpha_k Z_{jk}(t)
+\end{equation*}
+where  $\alpha_k, k = 1, \cdots, p$ are unknown parameters and $\alpha_0(t)$ is an arbitrary baseline function.
+\item As usual our data consists of a sample $(T_i, \delta_j, Z_j)$, and here skip the introduction of all notations.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Lin and Ying's Additive Hazards Model}
+\begin{itemize}
+\item To construct the estimates of $\alpha_k, k = 1,\cdots,p$, first construct the vector $\bar{Z}(t)$, which is the average value of the covariates at time $t$. That is,
+\begin{equation*}
+\bar{Z}(t) = \frac{\sum_{i=1}^{n}Z_i Y_i(t)}{\sum_{i=1}^{n}Y_i(t)}
+\end{equation*}
+the numerator is the sum of the covariates for all individuals at risk at time $t$ and the denominator is the number at risk at time $t$, and then construct the $p\times p$ matrix $A$ given by:
+\begin{equation*}
+A = \sum_{i=1}^{n}\sum_{j=1}^{i}(T_j - T_{j-1})[Z_i - \bar{Z}(T_j)]'[Z_i - \bar{Z}(T_j)]
+\end{equation*}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Lin and Ying's Additive Hazards Model}
+\begin{itemize}
+\item The $p-$vector $B$ given by:
+\begin{equation*}
+B' = \sum_{i=1}^{n} \delta_i [Z_i - \bar{Z}(T_i)]
+\end{equation*}
+and the $p \times p$ matrix $C$ by:
+\begin{equation*}
+C = \sum_{i=1}^{n} \delta_i [Z_i - \bar{Z}(T_i)]'[Z_i - \bar{Z}(T_i)]
+\end{equation*}
+\item The estimate of $\alpha = (\alpha_1, \cdots, \alpha_p)$
+is:
+\begin{equation*}
+\hat{\alpha}= A^{-1}B'
+\end{equation*}
+\item and the estimated variance of $\alpha$ is given by:
+\begin{equation*}
+\hat{V}= \hat{Var}(\hat{\alpha}) = A^{-1}C A^{-1}
+\end{equation*}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Lin and Ying's Additive Hazards Model}
+\begin{itemize}
+\item To test the hypothesis $H_j: \alpha_k = 0$, use the statistic:
+\begin{equation*}
+\frac{\hat{\alpha}_j}{\sqrt{\hat{V}_{jj}}} 
+\end{equation*}
+which has a $N(0,1)$ distribution for large $n$ under the $H_0$, the test of the hypothesis that $\alpha_j = 0$ for all $j\in J$ is based on the quadratic form:
+\begin{equation*}
+\chi^2 = [\hat{\alpha}_J - 0]' {\hat{V}_J}^{-1} [\hat{\alpha}_J - 0]
+\end{equation*}
+\item Under the $H_0$ the statistic has a chi squared distribution with degrees of freedom equal to the dimension of $J$.
+
+\end{itemize}
+\end{frame}
+
+
+
+\end{document}

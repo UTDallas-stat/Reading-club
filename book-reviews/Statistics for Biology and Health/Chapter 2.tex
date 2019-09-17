@@ -1,0 +1,251 @@
+\documentclass{beamer}
+
+% Some common packages
+\usepackage{graphicx, color}
+\usepackage{alltt}
+\usepackage{booktabs, calc, rotating}
+\usepackage{natbib}
+\usepackage{multicol}
+\usepackage{amsmath, amsbsy, amssymb, amsthm, graphicx}
+\usepackage[english]{babel}
+\usepackage{xkeyval} 
+\usepackage{xfrac}
+\usepackage[normalem]{ulem}
+\usepackage{fancyvrb} 
+\usepackage{tikz, geometry, tkz-graph, xcolor}
+\usepackage[latin1]{inputenc}
+\usepackage{times}
+\usepackage[T1]{fontenc}
+
+% Some shortcuts
+\newcommand{\cov}{\mathrm{cov}}
+\newcommand{\dif}{\mathrm{d}}
+\newcommand{\bigbrk}{\vspace*{2in}}
+\newcommand{\smallbrk}{\vspace*{.1in}}
+\newcommand{\midbrk}{\vspace*{1in}}
+\newcommand{\red}[1]{{\color{red}#1}}
+\newcommand{\blue}[1]{{\color{blue}#1}}
+\newcommand{\green}[1]{{\color{green}#1}}
+\newcommand{\calc}[1]{{\fbox{\mbox{#1}}}}
+\newcommand{\Var}{\mathrm{Var}}%
+\newcommand{\Cov}{\mathrm{Cov}}%
+
+\usetheme[numbering=fraction, progressbar = frametitle]{metropolis}
+% section page?
+% \usetheme[sectionpage=none]{metropolis}
+% place progressbar under frametitle?
+% \usetheme[progressbar = frametitle]{metropolis}
+
+
+
+% To center title?
+\setbeamertemplate{title page}[default]
+% To add a rectangle box for title?
+% \setbeamercolor{titlelike}{parent = frametitle}   
+
+% item color and shape
+% \setbeamertemplate{itemize item}{\color{mDarkTeal}$\bullet$}
+% \setbeamertemplate{itemize subitem}{\color{mDarkTeal}$\bullet$}
+% \setbeamertemplate{itemize subsubitem}{\color{mDarkTeal}$\bullet$}
+
+% UTD colors
+\definecolor{warmgray10}{RGB}{118,106,98}
+\definecolor{warmgray2}{RGB}{213,210,202}
+\definecolor{warmgray1}{RGB}{230,230,230}
+\definecolor{flameOrange}{RGB}{199,91,18}
+\definecolor{ecoGreen}{RGB}{0,133,86}
+
+% only change item color 
+\setbeamercolor*{itemize item}{fg = mDarkTeal}
+\setbeamercolor*{itemize subitem}{fg = mDarkTeal}
+\setbeamercolor*{itemize subsubitem}{fg = mDarkTeal}
+% enumerate color
+\setbeamercolor*{enumerate item}{fg = mDarkTeal}
+\setbeamercolor*{enumerate subitem}{fg = mDarkTeal}
+\setbeamercolor*{enumerate subsubitem}{fg = mDarkTeal}
+% description color
+\setbeamercolor*{description item}{fg = mDarkTeal}
+\setbeamercolor*{description subitem}{fg = mDarkTeal}
+\setbeamercolor*{description subsubitem}{fg = mDarkTeal}
+
+% define blocks
+\newenvironment<>{problock}[1]{
+  \begin{actionenv}#2
+    \def\insertblocktitle{#1}
+    \par
+    \mode<presentation>{
+      \setbeamercolor{block title}{fg = white, bg = ecoGreen} %mDarkTeal}
+      \setbeamercolor{block body}{fg = black, bg = warmgray1}
+    }
+    \usebeamertemplate{block begin}}
+  {\par\usebeamertemplate{block end}\end{actionenv}}
+
+\newenvironment<>{defblock}[1]{
+  \begin{actionenv}#2
+    \def\insertblocktitle{#1}
+    \par
+    \mode<presentation>{
+      \setbeamercolor{block title}{fg = white,bg = flameOrange} %mDarkBrown}
+      \setbeamercolor{block body}{fg = black,bg = warmgray1}
+    }
+    \usebeamertemplate{block begin}}
+  {\par\usebeamertemplate{block end}\end{actionenv}}
+
+% \setbeamerfont{block title}{size={}}
+% \setbeamercolor{titlelike}{parent=structure,bg=flameOrange!80!black,fg=white} % title
+\mode
+<all>
+
+% fancy for Verbatim?
+\fvset{frame = single, framesep = 1mm,fontfamily = courier,
+  fontsize = \scriptsize, numbers = left, framerule = .3mm,
+  numbersep = 1mm,commandchars = \\\{\}}
+
+% reset text width
+\setbeamersize{text margin left = 5pt,text margin right = 5pt}
+
+\title[Short title]{Statistics for Biology and Health\\ Chapter 2 Censoring and Truncation\\ 
+}
+\author[Author name]{Qi Guo}
+% \institute[UTD]{Department of Mathematical Sciences \\ The University of Texas at Dallas}
+\date{July 19,2019}
+% UTD logo on title page
+% \titlegraphic{\includegraphics[width=5cm]{mono_nsm_print_header.jpg}}
+\titlegraphic{\includegraphics[scale = .27]{UTDmono_NSM_header_RGB-1.png}}
+
+\begin{document}
+
+% default title thicker line
+% need to adjust
+% \frame{
+% \maketitle
+% \begin{tikzpicture}[remember picture, overlay]
+%   \def\xmargin{.1cm}     % Left and right margin of the title line
+%   \def\yshift{-0.1cm}   % Moves the title line upwards (-1.25cm moves title line downwards)
+%   \draw[mLightBrown,line width=2pt] (current page.west) ++(\xmargin,\yshift) -- ++({\paperwidth-2*\xmargin},0);
+% \end{tikzpicture}
+% }
+
+\frame{
+  \vspace{1cm}
+  \maketitle
+  \begin{tikzpicture}[remember picture, overlay]
+    \def\xmargin{.8cm}     % Left and right margin of the title line
+    \def\yshift{0.6cm}   % Moves the title line upwards 
+    \draw[mLightBrown,line width=2.2pt] (current page.west) ++(\xmargin,\yshift) -- ++({\paperwidth-2*\xmargin},0);
+  \end{tikzpicture}
+}
+
+
+% Set up UTD backgroud
+% Show background from here on
+\setbeamercolor*{item}{fg=red}
+\bgroup
+\usebackgroundtemplate{
+  \tikz[overlay,remember picture] \node[opacity=0.05, at=(current page.center)] {
+    \includegraphics[height=\paperheight,width=\paperwidth]{UTDbg}};}
+
+
+\begin{frame}{Contents}
+  \setbeamertemplate{section in toc}[sections numbered]
+  \tableofcontents[hideallsubsections]
+\end{frame}
+
+\section{Introduction}
+\begin{frame}{Introduction}
+\begin{itemize}
+\item Time-to-event data present themselves in different ways which create special problems in analyzing such data.
+There are two main features, one is known as censoring,occurs when some lifetimes are known to have occurred only within certain intervals, and the other one is truncation.
+\item About the censoring and truncation, more detail information are in Chapter 1 and notes before.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Notations}
+\begin{itemize}
+\item It's convention that random variables are denoted by upper case letters and fixed quantities or realizations of random variables are denoted by lower case letters.
+\item About censoring, $C_r$ is for a fixed right censoring time; $C_l$ is for a fixed left censoring time.
+\item About truncation, survival data occurs when only those individuals whose event time lies within a certain observational window $(Y_L,Y_R)$ are observed. When $Y_R$ is infinite then it's left truncation, and right truncation occurs when $Y_L$ is equal to zero.
+\end{itemize}
+\end{frame}
+
+\section{Likelihood Construction for Censored and Truncated Data}
+\begin{frame}{Likelihood for Censored and Truncated Data}
+\begin{itemize}
+\item A critical assumption is that the lifetimes and censoring times are independent.
+\item The likelihoods for various types of censoring schemes may all be written by incorporating the following components:
+\begin{description}
+\item exact lifetimes      -    $f(x)$
+\item right-censored observations   -  $S(C_r)$
+\item left-censored observations    -   $1-S(C_l)$
+\item interval-censored observations   -  $[S(L)-S(R)]$
+\item left-truncated observations  -  $f(x)/S(Y_L)$
+\item right-truncated observations  -  $f(x)/[1-S(Y_R)]$
+\item interval-truncated observations  -  $f(x)/[S(Y_L)-S(Y_R)]$
+\end{description}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Likelihood for Censored and Truncated Data}
+\begin{itemize}
+\item The likelihood function may be constructed by putting together the component parts as:
+\begin{equation*}
+L \propto \prod_{i \in D}^{} f(x_i)\prod_{i \in R}^{} S(C_r)\prod_{i \in L}^{} (1-S(C_l)) \prod_{i \in I}^{}[S(L_i)-S(R_i)]
+\end{equation*}
+where $D$ is the set of death times, $R$ is the set of right-censored observations, $L$ is the set of left-censored observations, and $I$ is the set of interval- censored observations.
+\end{itemize}
+\end{frame}
+
+\section{Counting Processes}
+\begin{frame}{Counting Processes}
+\begin{itemize}
+\item An alternative approach to developing inference procedures for censored and truncated data is by using counting process methodology.
+\item Define a counting processes $N(t)$, $t \ge 0$, as a stochastic process with the properties that $N(0)$ is zero; $N(t) < \infty$, with probability 1.
+\item $N(t)$ are right-continuous and piecewise constant with jumps of size+1.
+\item Given a right-censored sample, $N_i(t) = I[T_i \le t, S_i =1]$, which are zero until individual $i$ dies and then jump to 1, are counting process.
+\item The process $N(t) = \sum_{i=1}^{n}N_i(t)=\sum_{t_i \le t}^{}\delta_i$ counts  the number of deaths in the sample at or prior to time $t$ is another form of counting process.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{History}
+\begin{itemize}
+\item The accumulated knowledge about what has happened to patients up to time $t$ is called the history or filtration of the counting process at time $t$ and is denoted by $F_t$.
+\item And we know that $F_s \subset F_t$ when $s \le t$.
+\item For right-censored data, the history at time $t$, $F_t$, consists of knowledge of the pairs $(T_i,\delta_i)$ provided $T_i \le t$ and $T_i > t$ for those individuals still under study at time $t$, and denote the history at an instant just prior to time $t$ by $F_{t-}$.
+\item If we define the process $Y(t)$ as number of individuals with a study time $T_i \ge t$, then,
+ \begin{equation*}
+E[dN(t)|F_{t^-}]  = Y(t)h(t)dt
+ \end{equation*}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{The intensity process}
+\begin{itemize}
+ \item The process $\lambda(t)=Y(t)h(t)$ is called the intensity process of the counting process. $\lambda(t)$  is itself a stochastic process that depends on the information contained in the history process.
+ \item The stochastic process $Y(t)$is the process which provides us with the number of individuals at risk at a given time and, along with $N(t)$.
+ \item And define the process $\Lambda(t) = \int_{0}^{t}\lambda(s)d,\ t\ge 0$ as the cumulative intensity process,has the property that $E[N(t)|F_{t^-}] = E[\Lambda(t)|F_{t^-}]=\Lambda(t)$.
+ \item The stochastic process $M(t) = N(t)- \Lambda(t)$ is called the counting process martingale, it has the property that increments of this process have an expected value, given the strict past, $F_{t^-}$, that are zero.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Martingale}
+\begin{itemize}
+\item A stochastic process with the property that its expected value at time $t$, given its history at time $s<t$, is equal to its value at time $s$ is called a martingale, that is, $M(t)$ is a martingale if
+ \begin{equation*}
+E[M(t)|F_{s}]  = M(s), for \ all \ s<t
+\end{equation*}
+\item The counting process martingale $M(t) = N(t) -\Lambda(t)$ is made up of two parts. $N(t)$ is a nondecreasing step function, and $\Lambda(t)$ is a smooth process which is predictable in that its value at time t is fixed just prior to time t . This random function is called a compensator of the counting process.
+\item The martingale can be considered as mean zero noise which arises when we subtract the smoothly varying compensator from the counting process.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{The predictable variation process}
+\begin{itemize}
+\item The predictable variation process of $M(t)$, denoted by $<M>(t)$, is defined as the compensator of the process $M^2(t)$.
+\item Although $M(t)$ reflects the noise left after subtracting the compensator, $M^2(t)$ tends to increase with time, so here $M(t)$ is the systematic part of this increase and is the predictable process needed to be subtracted from $M^2(t)$ to produce a martingale.
+\item So we introduce the predictable variation process:
+$ var(dM (t) | F_{t^-}) = d<M>(t)$. 
+\item To find the variance recall that $dN(t)$ is a zero-one random variable with a probability, given the history, of time $\lambda(t)$ of having a jump of size one at time $t$. The variance of such a random variable is $\lambda(t)[1-\lambda(t)]$.
+\item  If there are no ties in the censored data case, ${\lambda(t)}^{2}$ is close to zero so that $ Var(dM (t) | F_{t^-})\cong \lambda(t) = Y(t)h(t) $. 
+\end{itemize}
+\end{frame}
+\end{document}

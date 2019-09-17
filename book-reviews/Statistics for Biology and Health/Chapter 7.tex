@@ -1,0 +1,338 @@
+\documentclass{beamer}
+
+% Some common packages
+\usepackage{graphicx, color}
+\usepackage{alltt}
+\usepackage{booktabs, calc, rotating}
+\usepackage{natbib}
+\usepackage{multicol}
+\usepackage{amsmath, amsbsy, amssymb, amsthm, graphicx}
+\usepackage[english]{babel}
+\usepackage{xkeyval} 
+\usepackage{xfrac}
+\usepackage[normalem]{ulem}
+\usepackage{fancyvrb} 
+\usepackage{tikz, geometry, tkz-graph, xcolor}
+\usepackage[latin1]{inputenc}
+\usepackage{times}
+\usepackage[T1]{fontenc}
+
+% Some shortcuts
+\newcommand{\cov}{\mathrm{cov}}
+\newcommand{\dif}{\mathrm{d}}
+\newcommand{\bigbrk}{\vspace*{2in}}
+\newcommand{\smallbrk}{\vspace*{.1in}}
+\newcommand{\midbrk}{\vspace*{1in}}
+\newcommand{\red}[1]{{\color{red}#1}}
+\newcommand{\blue}[1]{{\color{blue}#1}}
+\newcommand{\green}[1]{{\color{green}#1}}
+\newcommand{\calc}[1]{{\fbox{\mbox{#1}}}}
+\newcommand{\Var}{\mathrm{Var}}%
+\newcommand{\Cov}{\mathrm{Cov}}%
+
+\usetheme[numbering=fraction, progressbar = frametitle]{metropolis}
+% section page?
+% \usetheme[sectionpage=none]{metropolis}
+% place progressbar under frametitle?
+% \usetheme[progressbar = frametitle]{metropolis}
+
+
+
+% To center title?
+\setbeamertemplate{title page}[default]
+% To add a rectangle box for title?
+% \setbeamercolor{titlelike}{parent = frametitle}   
+
+% item color and shape
+% \setbeamertemplate{itemize item}{\color{mDarkTeal}$\bullet$}
+% \setbeamertemplate{itemize subitem}{\color{mDarkTeal}$\bullet$}
+% \setbeamertemplate{itemize subsubitem}{\color{mDarkTeal}$\bullet$}
+
+% UTD colors
+\definecolor{warmgray10}{RGB}{118,106,98}
+\definecolor{warmgray2}{RGB}{213,210,202}
+\definecolor{warmgray1}{RGB}{230,230,230}
+\definecolor{flameOrange}{RGB}{199,91,18}
+\definecolor{ecoGreen}{RGB}{0,133,86}
+
+% only change item color 
+\setbeamercolor*{itemize item}{fg = mDarkTeal}
+\setbeamercolor*{itemize subitem}{fg = mDarkTeal}
+\setbeamercolor*{itemize subsubitem}{fg = mDarkTeal}
+% enumerate color
+\setbeamercolor*{enumerate item}{fg = mDarkTeal}
+\setbeamercolor*{enumerate subitem}{fg = mDarkTeal}
+\setbeamercolor*{enumerate subsubitem}{fg = mDarkTeal}
+% description color
+\setbeamercolor*{description item}{fg = mDarkTeal}
+\setbeamercolor*{description subitem}{fg = mDarkTeal}
+\setbeamercolor*{description subsubitem}{fg = mDarkTeal}
+
+% define blocks
+\newenvironment<>{problock}[1]{
+  \begin{actionenv}#2
+    \def\insertblocktitle{#1}
+    \par
+    \mode<presentation>{
+      \setbeamercolor{block title}{fg = white, bg = ecoGreen} %mDarkTeal}
+      \setbeamercolor{block body}{fg = black, bg = warmgray1}
+    }
+    \usebeamertemplate{block begin}}
+  {\par\usebeamertemplate{block end}\end{actionenv}}
+
+\newenvironment<>{defblock}[1]{
+  \begin{actionenv}#2
+    \def\insertblocktitle{#1}
+    \par
+    \mode<presentation>{
+      \setbeamercolor{block title}{fg = white,bg = flameOrange} %mDarkBrown}
+      \setbeamercolor{block body}{fg = black,bg = warmgray1}
+    }
+    \usebeamertemplate{block begin}}
+  {\par\usebeamertemplate{block end}\end{actionenv}}
+
+% \setbeamerfont{block title}{size={}}
+% \setbeamercolor{titlelike}{parent=structure,bg=flameOrange!80!black,fg=white} % title
+\mode
+<all>
+
+% fancy for Verbatim?
+\fvset{frame = single, framesep = 1mm,fontfamily = courier,
+  fontsize = \scriptsize, numbers = left, framerule = .3mm,
+  numbersep = 1mm,commandchars = \\\{\}}
+
+% reset text width
+\setbeamersize{text margin left = 5pt,text margin right = 5pt}
+
+\title[Short title]{Statistics for Biology and Health\\ Chapter 7 Semiparametric Proportional Hazards Regression with Fixed Covariates\ 
+}
+\author[Author name]{Qi Guo}
+% \institute[UTD]{Department of Mathematical Sciences \\ The University of Texas at Dallas}
+\date{July 23,2019}
+% UTD logo on title page
+% \titlegraphic{\includegraphics[width=5cm]{mono_nsm_print_header.jpg}}
+\titlegraphic{\includegraphics[scale = .27]{UTDmono_NSM_header_RGB-1.png}}
+
+\begin{document}
+
+% default title thicker line
+% need to adjust
+% \frame{
+% \maketitle
+% \begin{tikzpicture}[remember picture, overlay]
+%   \def\xmargin{.1cm}     % Left and right margin of the title line
+%   \def\yshift{-0.1cm}   % Moves the title line upwards (-1.25cm moves title line downwards)
+%   \draw[mLightBrown,line width=2pt] (current page.west) ++(\xmargin,\yshift) -- ++({\paperwidth-2*\xmargin},0);
+% \end{tikzpicture}
+% }
+
+\frame{
+  \vspace{1cm}
+  \maketitle
+  \begin{tikzpicture}[remember picture, overlay]
+    \def\xmargin{.8cm}     % Left and right margin of the title line
+    \def\yshift{0.6cm}   % Moves the title line upwards 
+    \draw[mLightBrown,line width=2.2pt] (current page.west) ++(\xmargin,\yshift) -- ++({\paperwidth-2*\xmargin},0);
+  \end{tikzpicture}
+}
+
+
+% Set up UTD backgroud
+% Show background from here on
+\setbeamercolor*{item}{fg=red}
+\bgroup
+\usebackgroundtemplate{
+  \tikz[overlay,remember picture] \node[opacity=0.05, at=(current page.center)] {
+    \includegraphics[height=\paperheight,width=\paperwidth]{UTDbg}};}
+
+
+\begin{frame}{Contents}
+  \setbeamertemplate{section in toc}[sections numbered]
+  \tableofcontents[hideallsubsections]
+\end{frame}
+
+\section{Introduction}
+\begin{frame}{Introduction}
+\begin{itemize}
+\item  If the groups are similar, except for the treatment under study, then, the non-parametric methods in last chapter may be used.
+\item If the subjects in the groups have some additional characteristics that may affect their outcome, like gender, race, etc, we will consider in more detail the widely used multiplicative hazards model due to Cox (1972), often called the proportional hazards model.
+\item And we introduce it in notes before, here just briefly talk about it.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Semiparametric model}
+\begin{itemize}
+\item  Let $h(t|Z)$ be the hazard rate at time $t$ for an individual with risk vector $Z$. The basic model due to Cox is as follows:
+\begin{equation*}
+h(t|Z) = h_0(t)c(\beta' Z)
+\end{equation*}
+where $h_0(t)$ is an arbitrary baseline hazard rate, $\beta= (\beta_1,\cdots,\beta_p)'$ is a parameter vector, and $c(\beta' Z)$ is a known function. This is called the semiparametric model because a parametric form is assumed only for the covariate effect. The baseline hazard rate is treated nonparametrically.
+\item Commonly the $h(t|Z)$ is positive, so choose a model for $c(\beta' Z)$ is:
+\begin{equation*}
+c(\beta' Z) = \exp (\beta' Z) = \exp\big( \sum_{k=1}^{p} \beta_k Z_k\big)
+\end{equation*}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Example}
+\begin{itemize}
+\item The cox model is called the proportional hazard proportional model because the ratio of two groups of their hazard rates is a constant, the baseline function is cancel out.
+\item If $Z_1$ indicates the treatment effect($Z_1 = 1$ if treatment and $Z_1=0$ if placebo) and all other covariates have the same value, then, $h(t|Z)/h(t|Z^*)=exp(\beta_1)$, is the risk of having the event if the individual received the treatment relative to the risk of having the event should the individual have received the placebo.
+\end{itemize}
+\end{frame}
+
+\section{Coding Covariates}
+\begin{frame}{Coding Covariates}
+\begin{itemize}
+\item In general regression analyses one may have either quantitative or qualitative independent variables, and in this chapter we talk about the independent variables are known at the start of the study, and they are called fixed time covariates.
+\item For dichotomous variables(indicator variable), like gender, the obvious way is to code one of the genders as 1, the other as 0, for example, if we code the gender variable as $Z_1 =1$,if male, $0$ if female, the hazard rate for males will be $h(t | Z) = h_0(t)\exp(\beta_1)$, and for females will be $h(t | Z)=h_0(t)\exp(0)=h_0(t)$.
+\item For more categories, we can find it in notes before. 
+\end{itemize}
+\end{frame}
+
+\section{Partial Likelihoods When Ties Are Present}
+\begin{frame}{Introduction}
+\begin{itemize}
+\item Commonly the partial likelihood for the proportional hazards regression problem when there are no ties between the event times, when the ties exists, there are alternate partial likelihoods have been provided by a variety of authors when there are ties between event times.
+\item Let $t_1<t_2<\cdots<t_D$ denote the $D$ distinct, ordered, event times. Let $d_i$ be the number of deaths at $t_i$ and $D_i$ the set of all individuals who die at time $t_i$. Let $s_i$ be the sum of the vectors $Z_j$ over all individuals who die at $t_i$. That is $s_i = \sum_{j\in D_i}^{}Z_j$, and let $R_i$ be the set of all individuals at risk just prior to $t_i$.	
+\item There are several suggestions for constructing the partial likelihood when there are ties among the event times. 
+\end{itemize}
+\end{frame}
+
+\begin{frame}{The partial likelihood when ties are present}
+\begin{enumerate}
+\item The first is Breslow, which arises naturally from the profile likelihood construction, and it's expressed as:
+\begin{equation*}
+L_1(\beta) = \prod_{i=1}^{D} \frac{\exp(\beta' s_i)}{[\sum_{j\in R_i}^{}\exp(\beta' Z_j)]^{d_i}}
+\end{equation*}
+And when there are few ties, this approximation works quite well.
+\item Efron suggests a partial likelihood of:
+\begin{equation*}
+L_2(\beta)=\prod_{i=1}^{D} \frac{\exp(\beta' s_i)}{\prod_{j=1}^{d_i}[\sum_{k \in R_i}^{}\exp(\beta' Z_k) - \frac{j-1}{d_i}\sum_{k \in D_i}^{}\exp(\beta' Z_k)]}
+\end{equation*}
+which is closer to the correct partial likelihood based on a discrete hazard model than Breslow's likelihood. When the number of ties is small, Efron's and Breslow's likelihoods are quite close.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{The partial likelihood when ties are present}
+\ \ 3. The third partial likelihood due to Cox (1972) is based on a discrete-time, hazard-rate model.
+\begin{itemize}
+\item This likelihood is constructed by assuming a logistic model for the hazard rate, that is, if we let $h(t | Z)$ denote the conditional death probability in the interval $(t, t+1)$ given survival to the start of the interval and if we assume:	
+\begin{equation*}
+\frac{h(t|Z)}{1-h(t|Z)} = \frac{h_0(t)}{1-h_0(t)} \exp(\beta' Z)
+\end{equation*}
+then, this likelihood is the proper partial likelihood. 
+\end{itemize}
+\end{frame}
+
+\section{Discretizing a Continuous Covariate}
+\begin{frame}{Introduction}
+\begin{itemize}
+\item Sometimes for continuous covariate, we treat it as a binary covariate by assigning a score of 1 to subjects with large values and 0 otherwise, that's discretizing a continuous covariate.
+\item In most cases a major problem is determining the value of the cut point between high and low-risk groups.
+\item Here seek a cut point for the covariate which gives us the largest difference between individuals in the two data-defined groups. That is, for a continuous covariate, $X$, we seek a binary covariate $Z$ defined by $Z=1$ if $X
+\ge C$ and 0 if $X<C$,which makes the outcomes of the groups with $Z=1$ as different from the group with $Z=0$ as possible based on some statistic.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Test statistic}
+\begin{itemize}
+\item The statistic is the score statistic from the Cox model, and for the procedure we look at all possible cut points; and for each cut point, $C_k$ , we compute the log rank statistic based on the groups defined by
+$X$ being less than the cut point or greater than the cut point.
+\item At each event time, $t_i$ ,find the total number of deaths $d_i$ , and the total number at risk, $r_i$, and also find the total number of deaths and risks with $X \ge C_k$, $d^{+}_i$ and $r^{+}_i$, and then get the log rank statistic:
+\begin{equation*}
+S_k = \sum_{i=1}^{D} [d^{+}_i - d_i \frac{r^{+}_i}{r_i}]
+\end{equation*}
+where $D$ is the total number of distinct death times.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Test statistic}
+\begin{itemize}
+\item The estimated cut point $\hat{C}$ is the value of $C_k$ which yields the maximum $|S_k|$. At this cut point the Cox regression model is:
+\begin{equation*}
+h(t|X) = h_0(t)\exp(bZ)
+\end{equation*}
+where $Z=1$ if $X \ge \hat{C}$, 0 o.w. The usual tests of $H_0: b=0$ can not be used here since we picked the cut point$\hat{C}$, which is most favorable to rejecting $H_0$.
+\item First defined the quantity $s^2$:
+\begin{equation*}
+s^2 = \frac{1}{D-1} \sum_{i=1}^{D}\bigg\lbrace 1- \sum_{j=1}^{i} \frac{1}{D-j+1} \bigg\rbrace
+\end{equation*}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Test statistic}
+\begin{itemize}
+\item The test statistic is then:
+\begin{equation*}
+Q = \frac{max|S_k|}{s\sqrt{D-1}}
+\end{equation*}
+which under the $H_0$ has a limiting distribution of the supremum of the absolute value of a Brownian Bridge. For $Q>1$ the p-value of the test is approximately equal to $2\exp\lbrace -2Q^2 \rbrace$.
+\end{itemize}
+\end{frame}
+
+
+\section{Estimation of the Survival Function}
+\begin{frame}{Introduction}
+\begin{itemize}
+\item Once we have obtained estimates of the risk coefficients $\beta$ from a proportional hazards regression model, we can estimate the survival probability for a new patient with a given set of covariates $Z_0$. 
+\item First, fit a proportional hazards model to the data and obtain the partial maximum likelihood estimators $b$ and the estimated covariance matrix $\hat{V}(b)$ from the inverse of the information matrix.
+\item Let $t_1 < t_2 <\cdots< t_D$ denote the distinct death times and $d_i$ be the number of deaths at time $t_i$, let:
+\begin{equation*}
+W(t_i; b) = \sum_{j\in R(t_i)}^{}\exp\big(\sum_{h=1}^{p}b_h Z_{jh} \big)
+\end{equation*}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Estimation of the Survival Function}
+\begin{itemize}
+\item The estimator of the cumulative baseline hazard rate is given by:
+\begin{equation*}
+\hat{H}_0(t) = \sum_{ t_i \le t}^{}\frac{d_i}{W(t_i;b)}
+\end{equation*}
+which is a step function with jumps at the observed death times, and it reduces to the NA estimator when there are no covariates present.
+\item The estimator of the baseline survival function, $S_0(t) = \exp[-H_0(t)]$ is given by:
+\begin{equation*}
+\hat{S}_0(t) = \exp[-\hat{H}_0(t)]
+\end{equation*}
+\item To estimate the survival function for an individual with a covariate vector $Z = Z_0$, use the estimator:
+\begin{equation*}
+\hat{S}(t|Z=Z_0) = \hat{S}_0(t)^{\exp(b'Z_0)}
+\end{equation*}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Estimation of the Survival Function}
+\begin{itemize}
+\item For fixed $t$, it has an asymptotic normal distribution with mean $S(t|Z=Z_0)$ and a variance which can be estimated by:
+\begin{equation*}
+\hat{V}[\hat{S}(t|Z=Z_0)] = [\hat{S}(t|Z=Z_0)]^2[Q_1(t)+Q_2(t;Z_0)]
+\end{equation*}
+Here, 
+\begin{equation*}
+Q_1(t) = \sum_{t_i \le t}^{}\frac{d_i}{W(t_i,b)^2}
+\end{equation*}
+is an estimator of the variance of $\hat{H}_0(t)$ if $b$ were the true value of $\beta$. Here
+\begin{equation*}
+Q_2(t;Z_0) = Q_3(t;Z_0)'\hat{V}(b)Q_3(t;Z_0)
+\end{equation*}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Estimation of the Survival Function}
+\begin{itemize}
+\item with $Q_3$ the p-vector whose $k$th element is defined by
+\begin{equation*}
+Q_3(t,Z_0)_k = \sum_{ t_i \le t} \big[\frac{W^{k}(t_i;b)}{W(t_i;b)} - Z_{0k}\big] \big[\frac{d_i}{W(t_i,b)}\big],\ k = 1,\cdots,p
+\end{equation*}
+where 
+\begin{equation*}
+W^{k}(t_i;b) = \sum_{j \in R(t_i)}^{}Z_{jk}\exp(b' Z_j)
+\end{equation*}
+\item $Q_2$ reflects the uncertainty in the estimation process added by estimating $\beta$. Here, $Q_3(t,Z_0)$ is large when $Z_0$ is far from the average covariate in the risk set.
+\end{itemize}
+\end{frame}
+\end{document}
